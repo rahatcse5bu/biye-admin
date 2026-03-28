@@ -353,6 +353,20 @@ const RELIGIONS = [
   { value: 'hinduism', label: 'Hinduism' },
   { value: 'christianity', label: 'Christianity' },
 ]
+const RELIGIOUS_TYPES: Record<string, { value: string; label: string }[]> = {
+  islam: [
+    { value: 'practicing_muslim', label: 'প্র্যাক্টিসিং মুসলিম' },
+    { value: 'general_muslim', label: 'সাধারণ মুসলিম' },
+  ],
+  hinduism: [
+    { value: 'practicing_hindu', label: 'প্র্যাক্টিসিং হিন্দু' },
+    { value: 'general_hindu', label: 'সাধারণ হিন্দু' },
+  ],
+  christianity: [
+    { value: 'practicing_christian', label: 'প্র্যাক্টিসিং খ্রিস্টান' },
+    { value: 'general_christian', label: 'সাধারণ খ্রিস্টান' },
+  ],
+}
 const MARITAL_STATUSES = ['অবিবাহিত', 'বিবাহিত', 'ডিভোর্সড', 'বিধবা', 'বিপত্নীক']
 const BIO_TYPES = ['পাত্রের বায়োডাটা', 'পাত্রীর বায়োডাটা']
 const GENDERS = ['পুরুষ', 'মহিলা']
@@ -369,6 +383,7 @@ const EMPTY_FORM: CreateUnverifiedBiodataPayload & { extra_fields?: IExtraField[
   nationality: 'বাংলাদেশী',
   marital_status: 'অবিবাহিত',
   religion: 'islam',
+  religious_type: 'practicing_muslim',
   zilla: '',
   upzilla: '',
   division: '',
@@ -705,13 +720,31 @@ const BiodataFormModal: React.FC<{
                 <label className="block text-xs font-medium text-gray-600 mb-1">Religion *</label>
                 <select
                   value={form.religion}
-                  onChange={(e) => set('religion', e.target.value)}
+                  onChange={(e) => {
+                    const rel = e.target.value
+                    set('religion', rel)
+                    set('religious_type', RELIGIOUS_TYPES[rel]?.[0]?.value || '')
+                  }}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   required
                 >
                   {RELIGIONS.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
                 </select>
               </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Religious Type *</label>
+              <select
+                value={form.religious_type || ''}
+                onChange={(e) => set('religious_type', e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                required
+              >
+                {(RELIGIOUS_TYPES[form.religion] || []).map((r) => (
+                  <option key={r.value} value={r.value}>{r.label}</option>
+                ))}
+              </select>
             </div>
 
             <div className="grid grid-cols-3 gap-4">
