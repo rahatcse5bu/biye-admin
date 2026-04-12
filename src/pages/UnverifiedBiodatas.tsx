@@ -101,11 +101,11 @@ function parseDate(raw: string): string {
   // Full date: 2002-08-15 or 15/08/2002 or 15-08-2002
   const isoMatch = s.match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/)
   if (isoMatch) {
-    return `${isoMatch[1]}-${isoMatch[2].padStart(2,'0')}-${isoMatch[3].padStart(2,'0')}`
+    return `${isoMatch[1]}-${isoMatch[2].padStart(2, '0')}-${isoMatch[3].padStart(2, '0')}`
   }
   const dmyMatch = s.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{4})/)
   if (dmyMatch) {
-    return `${dmyMatch[3]}-${dmyMatch[2].padStart(2,'0')}-${dmyMatch[1].padStart(2,'0')}`
+    return `${dmyMatch[3]}-${dmyMatch[2].padStart(2, '0')}-${dmyMatch[1].padStart(2, '0')}`
   }
 
   // "August 2002" or "আগস্ট 2002"
@@ -372,7 +372,7 @@ const BIO_TYPES = ['পাত্রের বায়োডাটা', 'পা�
 const GENDERS = ['পুরুষ', 'মহিলা']
 const COMPLEXIONS = ['উজ্জ্বল ফর্সা', 'ফর্সা', 'শ্যামলা', 'উজ্জ্বল শ্যামলা', 'কালো']
 
-const EMPTY_FORM: CreateUnverifiedBiodataPayload & { extra_fields?: IExtraField[] } = {
+const EMPTY_FORM: CreateUnverifiedBiodataPayload & { extra_fields?: ExtraField[] } = {
   bio_type: 'পাত্রের বায়োডাটা',
   gender: 'পুরুষ',
   date_of_birth: '',
@@ -399,31 +399,31 @@ const EMPTY_FORM: CreateUnverifiedBiodataPayload & { extra_fields?: IExtraField[
 const BiodataFormModal: React.FC<{
   initial?: UnverifiedBiodata | null
   onClose: () => void
-  onSave: (payload: CreateUnverifiedBiodataPayload & { extra_fields?: IExtraField[] }) => void
+  onSave: (payload: CreateUnverifiedBiodataPayload & { extra_fields?: ExtraField[] }) => void
   saving: boolean
 }> = ({ initial, onClose, onSave, saving }) => {
-  const [form, setForm] = useState<CreateUnverifiedBiodataPayload & { extra_fields?: IExtraField[] }>(
+  const [form, setForm] = useState<CreateUnverifiedBiodataPayload & { extra_fields?: ExtraField[] }>(
     initial
       ? {
-          bio_type: initial.bio_type,
-          gender: initial.gender,
-          date_of_birth: initial.date_of_birth?.split('T')[0] || '',
-          height: initial.height,
-          weight: initial.weight,
-          blood_group: initial.blood_group,
-          screen_color: initial.screen_color,
-          nationality: initial.nationality,
-          marital_status: initial.marital_status,
-          religion: initial.religion,
-          religious_type: initial.religious_type,
-          zilla: initial.zilla,
-          upzilla: initial.upzilla,
-          division: initial.division,
-          contact_name: initial.contact_name,
-          contact_phone: initial.contact_phone,
-          contact_email: initial.contact_email,
-          extra_fields: initial.extra_fields || [],
-        }
+        bio_type: initial.bio_type,
+        gender: initial.gender,
+        date_of_birth: initial.date_of_birth?.split('T')[0] || '',
+        height: initial.height,
+        weight: initial.weight,
+        blood_group: initial.blood_group,
+        screen_color: initial.screen_color,
+        nationality: initial.nationality,
+        marital_status: initial.marital_status,
+        religion: initial.religion,
+        religious_type: initial.religious_type,
+        zilla: initial.zilla,
+        upzilla: initial.upzilla,
+        division: initial.division,
+        contact_name: initial.contact_name,
+        contact_phone: initial.contact_phone,
+        contact_email: initial.contact_email,
+        extra_fields: initial.extra_fields || [],
+      }
       : EMPTY_FORM
   )
 
@@ -648,13 +648,12 @@ const BiodataFormModal: React.FC<{
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Date of Birth *</label>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Date of Birth</label>
                 <input
                   type="date"
                   value={form.date_of_birth}
                   onChange={(e) => set('date_of_birth', e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  required
                 />
               </div>
               <div>
@@ -672,7 +671,7 @@ const BiodataFormModal: React.FC<{
 
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Height (cm) *</label>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Height (feet centimeters) *</label>
                 <input
                   type="number"
                   value={form.height}
@@ -759,14 +758,13 @@ const BiodataFormModal: React.FC<{
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Zilla *</label>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Zilla (District)</label>
                 <input
                   type="text"
-                  value={form.zilla}
+                  value={form.zilla || ''}
                   onChange={(e) => set('zilla', e.target.value)}
                   placeholder="e.g. গাইবান্ধা"
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  required
                 />
               </div>
               <div>
@@ -872,6 +870,10 @@ const UnverifiedBiodatas: React.FC = () => {
   const [searchInput, setSearchInput] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [editTarget, setEditTarget] = useState<UnverifiedBiodata | null>(null)
+  const [showPhotocardModal, setShowPhotocardModal] = useState(false)
+  const [photocardItem, setPhotocardItem] = useState<UnverifiedBiodata | null>(null)
+  const [photocardSVG, setPhotocardSVG] = useState<string>('')
+  const [generatingPhotocard, setGeneratingPhotocard] = useState(false)
 
   const { data, isLoading } = useQuery({
     queryKey: ['unverified-biodatas', page, search],
@@ -915,6 +917,36 @@ const UnverifiedBiodatas: React.FC = () => {
   const handleDelete = (id: string) => {
     if (!window.confirm('Delete this biodata permanently?')) return
     deleteMut.mutate(id)
+  }
+
+  const handleGeneratePhotocard = async (biodata: UnverifiedBiodata) => {
+    setGeneratingPhotocard(true)
+    setPhotocardItem(biodata)
+    try {
+      const response = await fetch(`http://localhost:5000/api/v1/photocard/${biodata._id}`)
+      if (!response.ok) throw new Error('Failed to generate photocard')
+      const svgText = await response.text()
+      setPhotocardSVG(svgText)
+      setShowPhotocardModal(true)
+      toast.success('Photocard generated!')
+    } catch (error) {
+      console.error('Photocard generation error:', error)
+      toast.error('Failed to generate photocard')
+    } finally {
+      setGeneratingPhotocard(false)
+    }
+  }
+
+  const downloadPhotocard = () => {
+    if (!photocardSVG || !photocardItem) return
+    const element = document.createElement('a')
+    element.setAttribute('href', 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(photocardSVG))
+    element.setAttribute('download', `biodata-${photocardItem.bio_id}-photocard.svg`)
+    element.style.display = 'none'
+    document.body.appendChild(element)
+    element.click()
+    document.body.removeChild(element)
+    toast.success('Photocard downloaded!')
   }
 
   const biodatas: UnverifiedBiodata[] = data?.data || []
@@ -1017,11 +1049,10 @@ const UnverifiedBiodatas: React.FC = () => {
                       UB-{item.bio_id?.toString().slice(-6)}
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                        item.bio_type === 'পাত্রের বায়োডাটা'
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'bg-pink-100 text-pink-700'
-                      }`}>
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${item.bio_type === 'পাত্রের বায়োডাটা'
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'bg-pink-100 text-pink-700'
+                        }`}>
                         {item.bio_type === 'পাত্রের বায়োডাটা' ? 'Male' : 'Female'}
                       </span>
                     </td>
@@ -1036,14 +1067,21 @@ const UnverifiedBiodatas: React.FC = () => {
                       {item.views_count} / {item.purchases_count}
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                        item.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-                      }`}>
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${item.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                        }`}>
                         {item.is_active ? 'Active' : 'Hidden'}
                       </span>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => handleGeneratePhotocard(item)}
+                          disabled={generatingPhotocard}
+                          title="Generate Photocard"
+                          className="p-1.5 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg disabled:opacity-50"
+                        >
+                          <SparklesIcon className="w-4 h-4" />
+                        </button>
                         <button
                           onClick={() => { setEditTarget(item); setShowForm(true) }}
                           title="Edit"
@@ -1114,6 +1152,63 @@ const UnverifiedBiodatas: React.FC = () => {
           }}
           saving={createMut.isPending || updateMut.isPending}
         />
+      )}
+
+      {/* Photocard Modal */}
+      {showPhotocardModal && photocardSVG && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto m-4">
+            <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-slate-800">
+                ✨ Photocard — Bio ID: {photocardItem?.bio_id}
+              </h2>
+              <button
+                onClick={() => setShowPhotocardModal(false)}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                <XMarkIcon className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {/* SVG Preview */}
+              <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                <div dangerouslySetInnerHTML={{ __html: photocardSVG }} className="flex justify-center" />
+              </div>
+
+              {/* Info */}
+              <div className="text-sm text-slate-600 bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="font-medium text-blue-900 mb-1">💡 Facebook Promotion Ready</p>
+                <p>This photocard is optimized for Facebook shares. Download it and use it to promote this biodata profile.</p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setShowPhotocardModal(false)}
+                  className="flex-1 px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={downloadPhotocard}
+                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg flex items-center justify-center gap-2"
+                >
+                  <DocumentArrowDownIcon className="w-4 h-4" />
+                  Download SVG
+                </button>
+              </div>
+
+              {/* URL Info */}
+              <div className="text-xs text-slate-600 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <p className="font-medium text-amber-900 mb-1">🔗 Biodata URL</p>
+                <code className="block bg-white p-2 rounded border border-amber-200 text-amber-900 mt-1 break-all">
+                  https://biye.info/biodata/unverified/{photocardItem?.bio_id}
+                </code>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

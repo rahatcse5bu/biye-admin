@@ -8,6 +8,7 @@ import Users from './pages/Users'
 import Settings from './pages/Settings'
 import ContactPurchases from './pages/ContactPurchases'
 import UnverifiedBiodatas from './pages/UnverifiedBiodatas'
+import TemplateManagement from './pages/TemplateManagement'
 import Login from './pages/Login'
 import { useAuthStore } from './store/authStore'
 
@@ -28,6 +29,7 @@ function App() {
         <Route path="/users" element={<Users />} />
         <Route path="/contact-purchases" element={<ContactPurchases />} />
         <Route path="/unverified-biodatas" element={<UnverifiedBiodatas />} />
+        <Route path="/templates" element={<TemplateManagement />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

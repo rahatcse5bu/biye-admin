@@ -10,18 +10,20 @@ import {
   ArrowPathIcon,
   ShoppingCartIcon,
   ExclamationCircleIcon,
+  PaintBrushIcon,
 } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../store/authStore'
 
 const navigation = [
-  { name: 'Dashboard',          href: '/',                  icon: ChartBarIcon },
-  { name: 'Biodatas',           href: '/biodatas',          icon: DocumentTextIcon },
-  { name: 'Users',              href: '/users',             icon: UsersIcon },
-  { name: 'Payments',          href: '/payments',          icon: CreditCardIcon },
+  { name: 'Dashboard', href: '/', icon: ChartBarIcon },
+  { name: 'Biodatas', href: '/biodatas', icon: DocumentTextIcon },
+  { name: 'Users', href: '/users', icon: UsersIcon },
+  { name: 'Payments', href: '/payments', icon: CreditCardIcon },
   { name: 'Contact Purchases', href: '/contact-purchases', icon: ShoppingCartIcon },
   { name: 'Unverified Biodatas', href: '/unverified-biodatas', icon: ExclamationCircleIcon },
-  { name: 'Refunds',           href: '/refunds',           icon: ArrowPathIcon },
-  { name: 'Settings',          href: '/settings',          icon: CogIcon },
+  { name: 'Refunds', href: '/refunds', icon: ArrowPathIcon },
+  { name: 'Templates', href: '/templates', icon: PaintBrushIcon },
+  { name: 'Settings', href: '/settings', icon: CogIcon },
 ]
 
 const Sidebar: React.FC = () => {
@@ -56,11 +58,10 @@ const Sidebar: React.FC = () => {
             <Link
               key={item.name}
               to={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
-                isActive
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${isActive
                   ? 'bg-indigo-600 text-white shadow-sm'
                   : 'text-slate-400 hover:bg-slate-800 hover:text-slate-100'
-              }`}
+                }`}
             >
               <item.icon
                 className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-indigo-200' : 'text-slate-500'}`}
