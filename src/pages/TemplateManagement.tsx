@@ -25,7 +25,8 @@ const TemplateManagement: React.FC = () => {
     const [editSvgCode, setEditSvgCode] = useState('');
     const [editBioType, setEditBioType] = useState<'supply' | 'demand'>('supply');
 
-    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const ENDPOINT_BASE = `${API_BASE_URL}/api/v1`;
 
     // Fetch all templates
     useEffect(() => {
@@ -35,7 +36,7 @@ const TemplateManagement: React.FC = () => {
     const fetchTemplates = async () => {
         try {
             setLoading(true);
-            const res = await axios.get(`${API_BASE_URL}/photocard-templates`);
+            const res = await axios.get(`${ENDPOINT_BASE}/photocard-templates`);
             setTemplates(res.data.data);
         } catch (error) {
             console.error('Error fetching templates:', error);
@@ -80,11 +81,11 @@ const TemplateManagement: React.FC = () => {
 
             if (selectedTemplate?._id) {
                 // Update existing
-                await axios.put(`${API_BASE_URL}/photocard-templates/${selectedTemplate._id}`, payload);
+                await axios.put(`${ENDPOINT_BASE}/photocard-templates/${selectedTemplate._id}`, payload);
                 alert('Template updated successfully');
             } else {
                 // Create new
-                await axios.post(`${API_BASE_URL}/photocard-templates`, payload);
+                await axios.post(`${ENDPOINT_BASE}/photocard-templates`, payload);
                 alert('Template created successfully');
             }
 
@@ -100,7 +101,7 @@ const TemplateManagement: React.FC = () => {
         if (!confirm('Are you sure you want to delete this template?')) return;
 
         try {
-            await axios.delete(`${API_BASE_URL}/photocard-templates/${templateId}`);
+            await axios.delete(`${ENDPOINT_BASE}/photocard-templates/${templateId}`);
             alert('Template deleted');
             fetchTemplates();
         } catch (error) {
