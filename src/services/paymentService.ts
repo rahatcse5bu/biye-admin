@@ -5,6 +5,7 @@ export interface Payment {
   transaction_id?: string
   method?: string
   user: string
+  email?: string
   amount?: number
   status: string          // "Completed" | "Pending" | "Refunded"
   type?: string
@@ -61,6 +62,12 @@ export const paymentService = {
   // Admin: update payment status
   updatePaymentStatus: async (id: string, status: string) => {
     const res = await api.patch(`/api/admin/payments/${id}/status`, { status })
+    return res.data
+  },
+
+  // Admin: refund the payment through bKash and take back its points
+  refundPayment: async (id: string) => {
+    const res = await api.post(`/api/admin/payments/${id}/refund`, {}, { timeout: 60000 })
     return res.data
   },
 

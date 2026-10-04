@@ -9,6 +9,7 @@ import Settings from "./pages/Settings";
 import ContactPurchases from "./pages/ContactPurchases";
 import UnverifiedBiodatas from "./pages/UnverifiedBiodatas";
 import TemplateManagement from "./pages/TemplateManagement";
+import PointsPackages from "./pages/PointsPackages";
 import Login from "./pages/Login";
 import { useAuthStore } from "./store/authStore";
 
@@ -29,6 +30,7 @@ function App() {
         <Route path="/payments" element={<Payments />} />
         <Route path="/transactions" element={<Payments />} />
         <Route path="/refunds" element={<Refunds />} />
+        <Route path="/points-packages" element={<PointsPackages />} />
         <Route path="/users" element={<Users />} />
         <Route path="/admins" element={<Users />} />
         <Route path="/user-status" element={<Users />} />

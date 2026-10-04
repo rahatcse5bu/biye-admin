@@ -12,6 +12,11 @@ export const dashboardService = {
     const res = await api.get('/api/admin/dashboard/stats')
     return res.data.data
   },
+  getPendingBiodataCount: async (): Promise<number> => {
+    const res = await api.get('/api/admin/biodatas/pending-count')
+    return res.data?.data?.count || 0
+  },
+
   getBioStats: async () => {
     const res = await api.get('/api/v1/bio-data/stats')
     return res.data.data

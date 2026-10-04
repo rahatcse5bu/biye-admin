@@ -3,7 +3,7 @@ import api from './api'
 export const refundService = {
   // bKash refund (admin)
   refundBkash: async (data: { paymentID: string; trxID: string; amount: string }) => {
-    const res = await api.post('/api/v1/bkash/refund', data)
+    const res = await api.post('/api/v1/bkash/refund', data, { timeout: 60000 })
     return res.data
   },
 

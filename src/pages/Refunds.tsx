@@ -121,8 +121,8 @@ const Refunds: React.FC = () => {
 
       {/* Info */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
-        <strong>How it works:</strong> Search for a bKash transaction first, then use the Payment ID and amount to process a refund.
-        Points mapping: ৳30→35pts, ৳100→120pts, ৳300→345pts, ৳500→560pts.
+        <strong>How it works:</strong> Search for a bKash transaction first, then refund the full amount using its Payment ID.
+        If the payment was made on this site, it is marked Refunded and its purchased points are removed from the user (never below zero).
       </div>
     </div>
   )

@@ -12,9 +12,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { paymentService, Payment } from "../services/paymentService";
 import { toast } from "react-toastify";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import { useConfirm } from "../components/ConfirmDialog";
 
 const Payments: React.FC = () => {
   const queryClient = useQueryClient();
+  const confirm = useConfirm();
   const location = useLocation();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -50,6 +52,41 @@ const Payments: React.FC = () => {
     },
     onError: () => toast.error("Failed to update payment status"),
   });
+
+  const refundMut = useMutation({
+    mutationFn: (id: string) => paymentService.refundPayment(id),
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      toast.success(
+        `Refunded via bKash (Refund TrxID: ${result?.data?.refundTrxID}). ${result?.data?.pointsRemoved ?? 0} points removed.`,
+      );
+    },
+    onError: (error: any) =>
+      toast.error(error?.response?.data?.message || "Refund failed"),
+  });
+
+  const handleRefund = async (p: Payment) => {
+    const ok = await confirm({
+      title: `Refund ৳${p.amount}?`,
+      message: (
+        <>
+          <dl className="grid grid-cols-[auto,1fr] gap-x-3 gap-y-1 rounded-lg bg-gray-50 p-3 text-gray-700">
+            <dt className="font-medium">Customer</dt>
+            <dd className="break-all">{p.email || "—"}</dd>
+            <dt className="font-medium">TrxID</dt>
+            <dd className="break-all font-mono text-xs leading-5">{p.transaction_id}</dd>
+            <dt className="font-medium">Points</dt>
+            <dd>{p.points ?? 0} will be removed</dd>
+          </dl>
+          <p className="mt-3">
+            The money is returned to the customer through bKash. This cannot be undone.
+          </p>
+        </>
+      ),
+      confirmLabel: "Refund",
+    });
+    if (ok) refundMut.mutate(p._id);
+  };
 
   const statusBadge = (s: string) => {
     const m: Record<string, string> = {
@@ -218,12 +255,13 @@ const Payments: React.FC = () => {
                       )}
                       {p.status === "Completed" && (
                         <button
-                          onClick={() =>
-                            statusMut.mutate({ id: p._id, status: "Refunded" })
-                          }
-                          className="text-xs px-2 py-1 bg-orange-50 text-orange-700 rounded hover:bg-orange-100"
+                          onClick={() => handleRefund(p)}
+                          disabled={refundMut.isPending}
+                          className="text-xs px-2 py-1 bg-orange-50 text-orange-700 rounded hover:bg-orange-100 disabled:opacity-50"
                         >
-                          Refund
+                          {refundMut.isPending && refundMut.variables === p._id
+                            ? "Refunding..."
+                            : "Refund"}
                         </button>
                       )}
                     </div>

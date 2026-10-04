@@ -11,6 +11,7 @@ import { useLocation } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { userService, User } from "../services/userService";
 import { toast } from "react-toastify";
+import { useConfirm } from "../components/ConfirmDialog";
 
 function useDebounce(value: string, delay: number) {
   const [debounced, setDebounced] = useState(value);
@@ -22,6 +23,7 @@ function useDebounce(value: string, delay: number) {
 }
 
 const Users: React.FC = () => {
+  const confirm = useConfirm();
   const queryClient = useQueryClient();
   const location = useLocation();
   const [search, setSearch] = useState("");
@@ -384,9 +386,18 @@ const Users: React.FC = () => {
                         </button>
                       )}
                       <button
-                        onClick={() => {
-                          if (confirm("Delete this user?"))
-                            deleteMut.mutate(u._id);
+                        onClick={async () => {
+                          const ok = await confirm({
+                            title: "Delete this user?",
+                            message: (
+                              <>
+                                <span className="font-medium text-gray-900">{u.email}</span>{" "}
+                                will be permanently deleted. This cannot be undone.
+                              </>
+                            ),
+                            confirmLabel: "Delete",
+                          });
+                          if (ok) deleteMut.mutate(u._id);
                         }}
                         className="text-xs px-2 py-1 bg-red-50 text-red-700 rounded hover:bg-red-100"
                         title="Delete"

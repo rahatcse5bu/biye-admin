@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FiPlus, FiEdit2, FiTrash2, FiEye } from 'react-icons/fi';
+import { useConfirm } from '../components/ConfirmDialog';
 
 interface Template {
     _id: string;
@@ -15,6 +16,7 @@ interface Template {
 }
 
 const TemplateManagement: React.FC = () => {
+    const confirm = useConfirm();
     const [templates, setTemplates] = useState<Template[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
@@ -98,7 +100,12 @@ const TemplateManagement: React.FC = () => {
     };
 
     const handleDeleteTemplate = async (templateId: string) => {
-        if (!confirm('Are you sure you want to delete this template?')) return;
+        const ok = await confirm({
+            title: 'Delete this template?',
+            message: 'The photocard template will be permanently deleted. This cannot be undone.',
+            confirmLabel: 'Delete',
+        });
+        if (!ok) return;
 
         try {
             await axios.delete(`${ENDPOINT_BASE}/photocard-templates/${templateId}`);

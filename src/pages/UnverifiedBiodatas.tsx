@@ -25,6 +25,7 @@ import {
 import { toast } from "react-toastify";
 import DynamicFieldBuilder from "../components/DynamicFieldBuilder/DynamicFieldBuilder";
 import { parseFieldsWithLLM } from "../services/llmFieldParser";
+import { useConfirm } from "../components/ConfirmDialog";
 
 /* ════════════════════════════════════════════════
    PARSER UTILITIES
@@ -1096,6 +1097,7 @@ const BiodataFormModal: React.FC<{
    MAIN PAGE
    ════════════════════════════════════════════════ */
 const UnverifiedBiodatas: React.FC = () => {
+  const confirm = useConfirm();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
@@ -1149,9 +1151,13 @@ const UnverifiedBiodatas: React.FC = () => {
   const toggleActive = (item: UnverifiedBiodata) =>
     updateMut.mutate({ id: item._id, payload: { is_active: !item.is_active } });
 
-  const handleDelete = (id: string) => {
-    if (!window.confirm("Delete this biodata permanently?")) return;
-    deleteMut.mutate(id);
+  const handleDelete = async (id: string) => {
+    const ok = await confirm({
+      title: "Delete this biodata?",
+      message: "The biodata will be permanently deleted. This cannot be undone.",
+      confirmLabel: "Delete",
+    });
+    if (ok) deleteMut.mutate(id);
   };
 
   const handleGeneratePhotocard = async (biodata: UnverifiedBiodata) => {

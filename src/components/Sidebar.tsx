@@ -11,6 +11,7 @@ import {
   FolderOpenIcon,
   BellIcon,
 } from "@heroicons/react/24/outline";
+import { useQuery } from "@tanstack/react-query";
 import { dashboardService } from "../services/dashboardService";
 
 type NavChild = {
@@ -25,6 +26,8 @@ type NavItem = {
   icon: React.ElementType;
   children?: NavChild[];
 };
+
+const PENDING_BIODATAS_HREF = "/biodatas?status=pending";
 
 const navigation: NavItem[] = [
   { name: "Dashboard", href: "/", icon: ChartBarIcon },
@@ -57,6 +60,11 @@ const navigation: NavItem[] = [
         name: "All Biodatas",
         href: "/biodatas",
         description: "Profile inventory",
+      },
+      {
+        name: "Pending Biodatas",
+        href: PENDING_BIODATAS_HREF,
+        description: "Awaiting approval",
       },
       {
         name: "Verified Biodatas",
@@ -104,6 +112,11 @@ const navigation: NavItem[] = [
         name: "Transactions",
         href: "/transactions?status=all",
         description: "All payment records",
+      },
+      {
+        name: "Points Packages",
+        href: "/points-packages",
+        description: "Website pricing plans",
       },
       { name: "Refunds", href: "/refunds", description: "Manual reversals" },
       {
@@ -161,7 +174,14 @@ const Sidebar: React.FC<{
   collapsed: boolean;
 }> = ({ open, onClose, collapsed }) => {
   const location = useLocation();
-  const [pendingBiodatas, setPendingBiodatas] = useState<number | null>(null);
+  // TODO: key sits under "biodatas" so status changes on the Biodatas page refresh it too.
+  const { data: pendingBiodatas = 0 } = useQuery({
+    queryKey: ["biodatas", "pending-count"],
+    queryFn: dashboardService.getPendingBiodataCount,
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
+  });
+  const badgeText = pendingBiodatas > 99 ? "99+" : String(pendingBiodatas);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
     () =>
       Object.fromEntries(
@@ -170,23 +190,6 @@ const Sidebar: React.FC<{
           .map((item) => [item.name, true]),
       ),
   );
-
-  useEffect(() => {
-    let active = true;
-
-    dashboardService
-      .getStats()
-      .then((stats) => {
-        if (active) setPendingBiodatas(stats.biodatas.pending);
-      })
-      .catch(() => {
-        if (active) setPendingBiodatas(null);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
 
   useEffect(() => {
     const activeGroup = navigation.find((item) =>
@@ -258,7 +261,17 @@ const Sidebar: React.FC<{
                   className="flex w-full items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-left text-slate-700 transition hover:bg-green-50"
                 >
                   <div className="flex min-w-0 items-center gap-3">
-                    <item.icon className="h-4 w-4 flex-shrink-0 text-slate-500" />
+                    <span className="relative flex-shrink-0">
+                      <item.icon className="h-4 w-4 text-slate-500" />
+                      {collapsed && item.name === "Biodatas" && pendingBiodatas > 0 && (
+                        <span
+                          className="absolute -right-2.5 -top-2.5 min-w-[18px] rounded-full bg-amber-500 px-1 text-center text-[10px] font-bold leading-[18px] text-white ring-2 ring-white"
+                          title={`${pendingBiodatas} pending biodatas`}
+                        >
+                          {badgeText}
+                        </span>
+                      )}
+                    </span>
                     {!collapsed && (
                       <span className="text-sm font-medium truncate">
                         {item.name}
@@ -266,9 +279,19 @@ const Sidebar: React.FC<{
                     )}
                   </div>
                   {!collapsed && (
-                    <ChevronDownIcon
-                      className={`h-4 w-4 text-slate-400 transition-transform ${isExpanded ? "rotate-0" : "-rotate-90"}`}
-                    />
+                    <span className="flex items-center gap-2">
+                      {item.name === "Biodatas" && !isExpanded && pendingBiodatas > 0 && (
+                        <span
+                          className="inline-flex min-w-6 items-center justify-center rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-white"
+                          title={`${pendingBiodatas} pending biodatas`}
+                        >
+                          {badgeText}
+                        </span>
+                      )}
+                      <ChevronDownIcon
+                        className={`h-4 w-4 text-slate-400 transition-transform ${isExpanded ? "rotate-0" : "-rotate-90"}`}
+                      />
+                    </span>
                   )}
                 </button>
 
@@ -291,9 +314,9 @@ const Sidebar: React.FC<{
                             <span className="block text-sm font-medium">
                               {child.name}
                             </span>
-                            {child.name === "Unverified Biodatas" && pendingBiodatas !== null && (
-                              <span className={`inline-flex min-w-6 items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold ${childActive ? "bg-white text-green-800" : "bg-green-800 text-white"}`}>
-                                {pendingBiodatas}
+                            {child.href === PENDING_BIODATAS_HREF && pendingBiodatas > 0 && (
+                              <span className={`inline-flex min-w-6 items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold ${childActive ? "bg-white text-green-800" : "bg-amber-500 text-white"}`}>
+                                {badgeText}
                               </span>
                             )}
                           </span>
