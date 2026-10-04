@@ -41,7 +41,7 @@ const StatCard: React.FC<StatCard> = ({
 }) => (
   <Link
     to={href}
-    className="group block rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-400 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2"
+    className="group block rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-green-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-offset-2"
     aria-label={`Open ${name}`}
   >
     <div className="flex items-center justify-between gap-4">
@@ -145,7 +145,7 @@ const Dashboard: React.FC = () => {
           value: stats.users.total,
           sub: `${stats.users.active} active`,
           icon: UsersIcon,
-          iconBg: "bg-slate-900 text-white",
+          iconBg: "bg-green-800 text-white",
           href: "/users",
         },
         {
@@ -153,7 +153,7 @@ const Dashboard: React.FC = () => {
           value: stats.biodatas.total,
           sub: `${stats.biodatas.verified} verified`,
           icon: DocumentTextIcon,
-          iconBg: "bg-slate-900 text-white",
+          iconBg: "bg-green-800 text-white",
           href: "/biodatas",
         },
         {
@@ -161,7 +161,7 @@ const Dashboard: React.FC = () => {
           value: `৳${stats.payments.revenue.toLocaleString()}`,
           sub: `${stats.payments.completed} completed`,
           icon: CreditCardIcon,
-          iconBg: "bg-slate-900 text-white",
+          iconBg: "bg-green-800 text-white",
           href: "/transactions?status=all",
         },
         {
@@ -169,7 +169,7 @@ const Dashboard: React.FC = () => {
           value: stats.payments.pending,
           sub: `${stats.payments.total} total`,
           icon: ClockIcon,
-          iconBg: "bg-slate-900 text-white",
+          iconBg: "bg-green-800 text-white",
           href: "/transactions?status=pending",
         },
       ]
@@ -180,7 +180,7 @@ const Dashboard: React.FC = () => {
             value: bioStats.total || 0,
             sub: "all submissions",
             icon: DocumentTextIcon,
-            iconBg: "bg-slate-900 text-white",
+            iconBg: "bg-green-800 text-white",
             href: "/biodatas",
           },
           {
@@ -188,7 +188,7 @@ const Dashboard: React.FC = () => {
             value: bioStats["পুরুষ"] || 0,
             sub: "male biodatas",
             icon: UsersIcon,
-            iconBg: "bg-slate-900 text-white",
+            iconBg: "bg-green-800 text-white",
             href: "/biodatas",
           },
           {
@@ -196,7 +196,7 @@ const Dashboard: React.FC = () => {
             value: bioStats["মহিলা"] || 0,
             sub: "female biodatas",
             icon: UsersIcon,
-            iconBg: "bg-slate-900 text-white",
+            iconBg: "bg-green-800 text-white",
             href: "/biodatas",
           },
         ]
@@ -207,7 +207,7 @@ const Dashboard: React.FC = () => {
         { name: "Active", value: stats.users.active, color: "#10B981" },
         { name: "Inactive", value: stats.users.inactive, color: "#F59E0B" },
         { name: "Banned", value: stats.users.banned, color: "#EF4444" },
-        { name: "Pending", value: stats.users.pending, color: "#0f766e" },
+        { name: "Pending", value: stats.users.pending, color: "#15803d" },
       ].filter((d) => d.value > 0)
     : [];
 
@@ -321,7 +321,7 @@ const Dashboard: React.FC = () => {
                     }}
                   />
                   <Bar dataKey="count" radius={[8, 8, 0, 0]}>
-                    <Cell fill="#0f766e" />
+                    <Cell fill="#15803d" />
                     <Cell fill="#94b8b2" />
                   </Bar>
                 </BarChart>
@@ -334,7 +334,7 @@ const Dashboard: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="mb-4 flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-800 text-white">
                 <UsersIcon className="h-4 w-4" />
               </div>
               <h3 className="text-sm font-semibold text-slate-900">
@@ -371,7 +371,7 @@ const Dashboard: React.FC = () => {
           </div>
           <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="mb-4 flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-800 text-white">
                 <DocumentTextIcon className="h-4 w-4" />
               </div>
               <h3 className="text-sm font-semibold text-slate-900">Biodatas</h3>
@@ -396,7 +396,7 @@ const Dashboard: React.FC = () => {
           </div>
           <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="mb-4 flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-800 text-white">
                 <CreditCardIcon className="h-4 w-4" />
               </div>
               <h3 className="text-sm font-semibold text-slate-900">Payments</h3>

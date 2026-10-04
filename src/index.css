@@ -43,13 +43,13 @@ code {
     -webkit-tap-highlight-color: transparent;
   }
   :focus-visible {
-    outline: 2px solid #0f766e;
+    outline: 2px solid #166534;
     outline-offset: 3px;
   }
   input,
   select,
   textarea {
-    accent-color: #0f766e;
+    accent-color: #166534;
   }
 }
 

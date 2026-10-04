@@ -4,17 +4,14 @@ import {
   ChartBarIcon,
   UsersIcon,
   CreditCardIcon,
-  ArrowLeftOnRectangleIcon,
   CogIcon,
   DocumentTextIcon,
   ChevronDownIcon,
   ShieldCheckIcon,
   FolderOpenIcon,
   BellIcon,
-  ChevronDoubleLeftIcon,
-  ChevronDoubleRightIcon,
 } from "@heroicons/react/24/outline";
-import { useAuthStore } from "../store/authStore";
+import { dashboardService } from "../services/dashboardService";
 
 type NavChild = {
   name: string;
@@ -162,10 +159,9 @@ const Sidebar: React.FC<{
   open: boolean;
   onClose: () => void;
   collapsed: boolean;
-  onToggleCollapse: () => void;
-}> = ({ open, onClose, collapsed, onToggleCollapse }) => {
+}> = ({ open, onClose, collapsed }) => {
   const location = useLocation();
-  const { logout, user } = useAuthStore();
+  const [pendingBiodatas, setPendingBiodatas] = useState<number | null>(null);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
     () =>
       Object.fromEntries(
@@ -174,6 +170,23 @@ const Sidebar: React.FC<{
           .map((item) => [item.name, true]),
       ),
   );
+
+  useEffect(() => {
+    let active = true;
+
+    dashboardService
+      .getStats()
+      .then((stats) => {
+        if (active) setPendingBiodatas(stats.biodatas.pending);
+      })
+      .catch(() => {
+        if (active) setPendingBiodatas(null);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     const activeGroup = navigation.find((item) =>
@@ -190,9 +203,9 @@ const Sidebar: React.FC<{
       aria-label="Main navigation"
       className={`fixed inset-y-0 left-0 z-40 flex h-screen flex-col border-r border-slate-200 bg-white shadow-sm transition-all duration-200 lg:static ${open ? "translate-x-0 visible" : "-translate-x-full"} lg:translate-x-0 lg:visible ${collapsed ? "w-20 lg:w-20" : "w-[260px] lg:w-[260px]"}`}
     >
-      <div className="flex items-center justify-between border-b border-slate-200 px-3 py-4">
+      <div className="flex h-16 items-center border-b border-slate-200 px-3">
         <div className="flex items-center gap-3 overflow-hidden">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-black text-sm font-bold tracking-[0.12em] text-white shadow-sm">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-800 text-xs font-bold tracking-[0.12em] text-white">
             PN
           </div>
           {!collapsed && (
@@ -205,17 +218,6 @@ const Sidebar: React.FC<{
           )}
         </div>
 
-        <button
-          onClick={onToggleCollapse}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className="hidden h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition hover:bg-slate-100 lg:flex"
-        >
-          {collapsed ? (
-            <ChevronDoubleRightIcon className="h-4 w-4" />
-          ) : (
-            <ChevronDoubleLeftIcon className="h-4 w-4" />
-          )}
-        </button>
       </div>
 
       {!collapsed && (
@@ -242,7 +244,7 @@ const Sidebar: React.FC<{
             return (
               <div
                 key={item.name}
-                className={`rounded-xl border ${isActive ? "border-slate-200 bg-slate-50" : "border-transparent bg-transparent"}`}
+                className={`rounded-xl border ${isActive ? "border-green-100 bg-green-50" : "border-transparent bg-transparent"}`}
               >
                 <button
                   type="button"
@@ -253,7 +255,7 @@ const Sidebar: React.FC<{
                     }))
                   }
                   aria-expanded={isExpanded}
-                  className="flex w-full items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-left text-slate-700 transition hover:bg-slate-100"
+                  className="flex w-full items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-left text-slate-700 transition hover:bg-green-50"
                 >
                   <div className="flex min-w-0 items-center gap-3">
                     <item.icon className="h-4 w-4 flex-shrink-0 text-slate-500" />
@@ -281,12 +283,19 @@ const Sidebar: React.FC<{
                           onClick={onClose}
                           className={`block rounded-lg px-3 py-2 transition-colors ${
                             childActive
-                              ? "bg-black text-white shadow-sm"
-                              : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                              ? "bg-green-800 text-white shadow-sm"
+                              : "text-slate-600 hover:bg-green-50 hover:text-green-900"
                           }`}
                         >
-                          <span className="block text-sm font-medium">
-                            {child.name}
+                          <span className="flex items-center justify-between gap-2">
+                            <span className="block text-sm font-medium">
+                              {child.name}
+                            </span>
+                            {child.name === "Unverified Biodatas" && pendingBiodatas !== null && (
+                              <span className={`inline-flex min-w-6 items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold ${childActive ? "bg-white text-green-800" : "bg-green-800 text-white"}`}>
+                                {pendingBiodatas}
+                              </span>
+                            )}
                           </span>
                           {child.description && (
                             <span className="mt-1 block text-[11px] text-slate-500">
@@ -310,8 +319,8 @@ const Sidebar: React.FC<{
               aria-current={isActive ? "page" : undefined}
               className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${collapsed ? "justify-center px-0" : ""} ${
                 isActive
-                  ? "bg-black text-white shadow-sm"
-                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  ? "bg-green-800 text-white shadow-sm"
+                  : "text-slate-600 hover:bg-green-50 hover:text-green-900"
               }`}
             >
               <item.icon
@@ -323,41 +332,6 @@ const Sidebar: React.FC<{
         })}
       </nav>
 
-      <div className="border-t border-slate-200 px-3 pb-4 pt-3">
-        {!collapsed ? (
-          <>
-            <div className="flex items-center gap-3 rounded-lg px-3 py-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-xs font-semibold text-white">
-                {user?.email?.[0]?.toUpperCase() || "A"}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-xs font-medium text-slate-700">
-                  {user?.email || "admin"}
-                </p>
-                <p className="mt-0.5 text-[11px] capitalize text-slate-500">
-                  {user?.user_role || "admin"}
-                </p>
-              </div>
-            </div>
-
-            <button
-              onClick={() => logout()}
-              className="mt-2 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
-            >
-              <ArrowLeftOnRectangleIcon className="h-4 w-4 flex-shrink-0" />
-              Sign out
-            </button>
-          </>
-        ) : (
-          <button
-            onClick={() => logout()}
-            className="flex h-10 w-full items-center justify-center rounded-lg text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
-            aria-label="Sign out"
-          >
-            <ArrowLeftOnRectangleIcon className="h-4 w-4" />
-          </button>
-        )}
-      </div>
     </aside>
   );
 };

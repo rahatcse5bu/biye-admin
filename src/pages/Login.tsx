@@ -1,83 +1,88 @@
-import React, { useState } from 'react'
-import { useAuthStore } from '../store/authStore'
-import { authService } from '../services/authService'
-import { toast } from 'react-toastify'
-import { GoogleLogin } from '@react-oauth/google'
-import { ShieldCheckIcon } from '@heroicons/react/24/outline'
+import React, { useState } from "react";
+import { useAuthStore } from "../store/authStore";
+import { authService } from "../services/authService";
+import { toast } from "react-toastify";
+import { GoogleLogin } from "@react-oauth/google";
+import { ShieldCheckIcon } from "@heroicons/react/24/outline";
 
 const Login: React.FC = () => {
-  const [isLoading, setIsLoading] = useState(false)
-  const [useEmailLogin, setUseEmailLogin] = useState(false)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const { login } = useAuthStore()
+  const [isLoading, setIsLoading] = useState(false);
+  const [useEmailLogin, setUseEmailLogin] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { login } = useAuthStore();
 
   const handleGoogleSignIn = async (credentialResponse: any) => {
     if (!credentialResponse?.credential) {
-      toast.error('Google login information not received')
-      return
+      toast.error("Google login information not received");
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const response = await authService.googleAuth({
         credential: credentialResponse.credential,
-      })
+      });
 
-      if (response.user.user_role !== 'admin') {
-        toast.error('Access denied. Admin privileges required.')
-        return
+      if (response.user.user_role !== "admin") {
+        toast.error("Access denied. Admin privileges required.");
+        return;
       }
 
-      login(response.token, response.user)
-      toast.success('Welcome back!')
+      login(response.token, response.user);
+      toast.success("Welcome back!");
     } catch (error: any) {
-      console.error('Google login error:', error)
+      console.error("Google login error:", error);
       if (error.response?.status === 401) {
-        toast.error('Access denied. Admin privileges required.')
+        toast.error("Access denied. Admin privileges required.");
       } else {
-        toast.error(error.response?.data?.message || 'Google login failed. Please try again.')
+        toast.error(
+          error.response?.data?.message ||
+            "Google login failed. Please try again.",
+        );
       }
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleDirectSignIn = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!email || !password) {
-      toast.error('Email and password are required')
-      return
+      toast.error("Email and password are required");
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const response = await authService.login({
         email,
         password,
-      })
+      });
 
-      if (response.user.user_role !== 'admin') {
-        toast.error('Access denied. Admin privileges required.')
-        return
+      if (response.user.user_role !== "admin") {
+        toast.error("Access denied. Admin privileges required.");
+        return;
       }
 
-      login(response.token, response.user)
-      toast.success('Welcome back!')
+      login(response.token, response.user);
+      toast.success("Welcome back!");
     } catch (error: any) {
-      console.error('Login error:', error)
+      console.error("Login error:", error);
       if (error.response?.status === 401) {
-        toast.error('Invalid credentials or admin access denied.')
+        toast.error("Invalid credentials or admin access denied.");
       } else {
-        toast.error(error.response?.data?.message || 'Login failed. Please try again.')
+        toast.error(
+          error.response?.data?.message || "Login failed. Please try again.",
+        );
       }
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen flex bg-slate-900">
+    <div className="min-h-screen flex bg-green-950">
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 bg-[#132c36] relative overflow-hidden">
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-white/5 rounded-full" />
         <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-white/5 rounded-full" />
@@ -87,28 +92,36 @@ const Login: React.FC = () => {
             <span className="text-white font-bold text-base">PN</span>
           </div>
           <div>
-            <p className="text-white font-semibold text-lg leading-none">PNC Nikah</p>
-            <p className="text-teal-200 text-xs mt-0.5">Admin Portal</p>
+            <p className="text-white font-semibold text-lg leading-none">
+              PNC Nikah
+            </p>
+            <p className="text-green-200 text-xs mt-0.5">Admin Portal</p>
           </div>
         </div>
         <div className="relative space-y-4">
           <h1 className="text-4xl font-bold text-white leading-tight">
-            A thoughtful space.<br />A connected community.
+            A thoughtful space.
+            <br />A connected community.
           </h1>
-          <p className="text-teal-200 text-base leading-relaxed max-w-sm">
-            Full control over biodatas, users, payments, and refunds — all in one place.
+          <p className="text-green-200 text-base leading-relaxed max-w-sm">
+            Full control over biodatas, users, payments, and refunds — all in
+            one place.
           </p>
           <div className="flex items-center gap-2 pt-2">
-            <ShieldCheckIcon className="h-5 w-5 text-teal-300" />
-            <span className="text-teal-300 text-sm">Restricted to admin accounts only</span>
+            <ShieldCheckIcon className="h-5 w-5 text-green-300" />
+            <span className="text-green-300 text-sm">
+              Restricted to admin accounts only
+            </span>
           </div>
         </div>
-        <p className="relative text-teal-300/60 text-xs">© {new Date().getFullYear()} PNC Soft Tech. All rights reserved.</p>
+        <p className="relative text-green-300/60 text-xs">
+          © {new Date().getFullYear()} PNC Soft Tech. All rights reserved.
+        </p>
       </div>
       <div className="flex-1 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-sm space-y-8">
           <div className="lg:hidden flex items-center gap-3 mb-4">
-            <div className="w-9 h-9 rounded-xl bg-teal-700 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-green-700 flex items-center justify-center">
               <span className="text-white font-bold text-sm">PN</span>
             </div>
             <p className="text-gray-900 font-semibold">PNC Nikah Admin</p>
@@ -116,7 +129,10 @@ const Login: React.FC = () => {
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Welcome back</h2>
             <p className="mt-1 text-sm text-gray-500">
-              {useEmailLogin ? 'Use your admin credentials' : 'Use your admin Google account'} to continue
+              {useEmailLogin
+                ? "Use your admin credentials"
+                : "Use your admin Google account"}{" "}
+              to continue
             </p>
           </div>
 
@@ -128,19 +144,36 @@ const Login: React.FC = () => {
               >
                 {isLoading ? (
                   <div
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-teal-600"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-green-700"
                     role="status"
                   >
-                    <svg className="w-4 h-4 animate-spin text-gray-400" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                    <svg
+                      className="w-4 h-4 animate-spin text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                      />
                     </svg>
                     <span>Signing in…</span>
                   </div>
                 ) : (
                   <GoogleLogin
                     onSuccess={handleGoogleSignIn}
-                    onError={() => toast.error('Google login failed. Please try again.')}
+                    onError={() =>
+                      toast.error("Google login failed. Please try again.")
+                    }
                     text="signin_with"
                     size="large"
                     width="280"
@@ -151,7 +184,9 @@ const Login: React.FC = () => {
               </div>
 
               <p className="text-center text-xs text-gray-400">
-                Only accounts with <span className="font-semibold text-gray-600">admin</span> privileges can access this panel.
+                Only accounts with{" "}
+                <span className="font-semibold text-gray-600">admin</span>{" "}
+                privileges can access this panel.
               </p>
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
@@ -163,7 +198,7 @@ const Login: React.FC = () => {
               </div>
               <button
                 onClick={() => setUseEmailLogin(true)}
-                className="w-full px-5 py-3 border-2 border-teal-200 rounded-xl text-sm font-medium text-teal-600 bg-teal-50 hover:bg-teal-100 hover:border-teal-300 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-all"
+                className="w-full px-5 py-3 border-2 border-green-200 rounded-xl text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 hover:border-green-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all"
               >
                 Sign in with email
               </button>
@@ -180,7 +215,7 @@ const Login: React.FC = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="admin@example.com"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     required
                   />
                 </div>
@@ -194,7 +229,7 @@ const Login: React.FC = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     required
                   />
                 </div>
@@ -202,24 +237,39 @@ const Login: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full flex items-center justify-center gap-2 px-5 py-2.5 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-2 px-5 py-2.5 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
                     <>
-                      <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                      <svg
+                        className="w-4 h-4 animate-spin"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        />
                       </svg>
                       <span>Signing in…</span>
                     </>
                   ) : (
-                    'Sign in'
+                    "Sign in"
                   )}
                 </button>
               </form>
               <button
                 onClick={() => setUseEmailLogin(false)}
-                className="w-full px-5 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-all"
+                className="w-full px-5 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all"
               >
                 Back to Google sign-in
               </button>
@@ -228,7 +278,7 @@ const Login: React.FC = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;
