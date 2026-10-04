@@ -1,4 +1,5 @@
 import React from 'react'
+import EmailBrandingPanel from '../components/EmailBrandingPanel'
 
 const Settings: React.FC = () => {
   return (
@@ -7,6 +8,8 @@ const Settings: React.FC = () => {
         <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
         <p className="mt-1 text-gray-500">Platform configuration</p>
       </div>
+
+      <EmailBrandingPanel />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* API Endpoints Info */}
@@ -53,6 +56,7 @@ const Settings: React.FC = () => {
         <div className="bg-white shadow rounded-xl p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">📧 Admin Notifications</h2>
           <div className="space-y-2 text-sm">
+            <InfoRow label="Support Inbox" value="bibahosupport@gmail.com" />
             <InfoRow label="Admin Email 1" value="anis.cse5.bu@gmail.com" />
             <InfoRow label="Admin Email 2" value="rahat.cse5.bu@gmail.com" />
             <p className="text-xs text-gray-500 mt-3">Admin notifications are sent when users change status, submit biodatas for review, or make purchases.</p>
