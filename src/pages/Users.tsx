@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { MagnifyingGlassIcon, ChevronLeftIcon, ChevronRightIcon, ArrowPathIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { format } from 'date-fns'
+import { useLocation } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { userService, User } from '../services/userService'
 import { toast } from 'react-toastify'
@@ -16,11 +17,32 @@ function useDebounce(value: string, delay: number) {
 
 const Users: React.FC = () => {
   const queryClient = useQueryClient()
+  const location = useLocation()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [roleFilter, setRoleFilter] = useState('all')
   const [page, setPage] = useState(1)
   const limit = 20
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const path = location.pathname
+
+    if (path === '/admins') {
+      setRoleFilter('admin')
+      setStatusFilter('all')
+      return
+    }
+
+    if (path === '/user-status') {
+      setRoleFilter('all')
+      setStatusFilter(params.get('status') || 'active')
+      return
+    }
+
+    setRoleFilter(params.get('role') || 'all')
+    setStatusFilter(params.get('status') || 'all')
+  }, [location.pathname, location.search])
 
   const debouncedSearch = useDebounce(search, 400)
 

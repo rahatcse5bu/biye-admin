@@ -30,19 +30,17 @@ interface StatCard {
 }
 
 const StatCard: React.FC<StatCard> = ({ name, value, sub, icon: Icon, iconBg }) => (
-  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-    <div className="p-5">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm text-gray-500 font-medium">{name}</p>
-          <p className="text-3xl font-semibold text-gray-900 mt-1 tracking-tight">
-            {typeof value === 'number' ? value.toLocaleString() : value}
-          </p>
-          <p className="text-xs text-gray-400 mt-1">{sub}</p>
-        </div>
-        <div className={`p-2.5 rounded-xl ${iconBg}`}>
-          <Icon className="h-5 w-5" />
-        </div>
+  <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div className="flex items-center justify-between gap-4">
+      <div>
+        <p className="text-xs font-medium uppercase tracking-[0.12em] text-slate-500">{name}</p>
+        <p className="mt-3 text-2xl font-semibold text-slate-900">
+          {typeof value === 'number' ? value.toLocaleString() : value}
+        </p>
+        <p className="mt-1 text-xs text-slate-500">{sub}</p>
+      </div>
+      <div className={`flex h-11 w-11 items-center justify-center rounded-lg ${iconBg}`}>
+        <Icon className="h-5 w-5" />
       </div>
     </div>
   </div>
@@ -102,8 +100,8 @@ const Dashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-3">
-        <ArrowPathIcon className="h-8 w-8 animate-spin text-indigo-500" />
-        <p className="text-sm text-gray-400">Loading dashboard…</p>
+        <ArrowPathIcon className="h-8 w-8 animate-spin text-slate-900" />
+        <p className="text-sm text-slate-500">Loading dashboard…</p>
       </div>
     )
   }
@@ -115,28 +113,28 @@ const Dashboard: React.FC = () => {
           value: stats.users.total,
           sub: `${stats.users.active} active`,
           icon: UsersIcon,
-          iconBg: 'bg-teal-50 text-teal-700',
+          iconBg: 'bg-slate-900 text-white',
         },
         {
           name: 'Total Biodatas',
           value: stats.biodatas.total,
           sub: `${stats.biodatas.verified} verified`,
           icon: DocumentTextIcon,
-          iconBg: 'bg-emerald-50 text-emerald-700',
+          iconBg: 'bg-slate-900 text-white',
         },
         {
           name: 'Revenue',
           value: `৳${stats.payments.revenue.toLocaleString()}`,
           sub: `${stats.payments.completed} completed`,
           icon: CreditCardIcon,
-          iconBg: 'bg-slate-100 text-slate-700',
+          iconBg: 'bg-slate-900 text-white',
         },
         {
           name: 'Pending Payments',
           value: stats.payments.pending,
           sub: `${stats.payments.total} total`,
           icon: ClockIcon,
-          iconBg: 'bg-amber-50 text-amber-700',
+          iconBg: 'bg-slate-900 text-white',
         },
       ]
     : bioStats
@@ -146,21 +144,21 @@ const Dashboard: React.FC = () => {
           value: bioStats.total || 0,
           sub: 'all submissions',
           icon: DocumentTextIcon,
-          iconBg: 'bg-emerald-50 text-emerald-700',
+          iconBg: 'bg-slate-900 text-white',
         },
         {
           name: 'পাত্রের বায়োডাটা',
           value: bioStats['পুরুষ'] || 0,
           sub: 'male biodatas',
           icon: UsersIcon,
-          iconBg: 'bg-teal-50 text-teal-700',
+          iconBg: 'bg-slate-900 text-white',
         },
         {
           name: 'পাত্রীর বায়োডাটা',
           value: bioStats['মহিলা'] || 0,
           sub: 'female biodatas',
           icon: UsersIcon,
-          iconBg: 'bg-rose-50 text-rose-700',
+          iconBg: 'bg-slate-900 text-white',
         },
       ]
     : []
@@ -183,18 +181,18 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">Platform overview</h2>
-        <p className="text-sm text-gray-400 mt-0.5">A clear view of your community, submissions, and revenue.</p>
+      <div className="border-b border-slate-200 pb-4">
+        <h2 className="text-2xl font-semibold text-slate-900">Overview</h2>
+        <p className="mt-1 text-sm text-slate-500">Platform activity at a glance.</p>
       </div>
       {cards.length === 0 && (
-        <div role="status" className="rounded-xl border border-slate-200 bg-white p-8 text-center">
-          <DocumentTextIcon className="mx-auto mb-3 h-8 w-8 text-slate-400" />
+        <div role="status" className="rounded-xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+          <DocumentTextIcon className="mx-auto mb-3 h-8 w-8 text-slate-500" />
           <h3 className="font-semibold text-slate-800">Statistics are unavailable</h3>
           <p className="mt-2 text-sm text-slate-500">Please reload the page to try again.</p>
         </div>
       )}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map((c) => (
           <StatCard key={c.name} {...c} />
         ))}
@@ -202,9 +200,9 @@ const Dashboard: React.FC = () => {
       {(pieData.length > 0 || bioBarData.length > 0) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {pieData.length > 0 && (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <h3 className="text-base font-semibold text-gray-900 mb-1">User Status</h3>
-              <p className="text-xs text-gray-400 mb-5">Distribution across all accounts</p>
+            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <h3 className="text-base font-semibold text-slate-900">User Status</h3>
+              <p className="mt-1 text-xs text-slate-500">Distribution across all accounts</p>
               <ResponsiveContainer width="100%" height={260}>
                 <PieChart>
                   <Pie
@@ -235,9 +233,9 @@ const Dashboard: React.FC = () => {
           )}
 
           {bioBarData.length > 0 && (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <h3 className="text-base font-semibold text-gray-900 mb-1">Biodata Gender Split</h3>
-              <p className="text-xs text-gray-400 mb-5">Male vs. female submissions</p>
+            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <h3 className="text-base font-semibold text-slate-900">Biodata Gender Split</h3>
+              <p className="mt-1 text-xs text-slate-500">Male vs. female submissions</p>
               <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={bioBarData} barSize={48}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -258,15 +256,15 @@ const Dashboard: React.FC = () => {
         </div>
       )}
       {stats && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-2 bg-indigo-50 rounded-lg">
-                <UsersIcon className="h-4 w-4 text-indigo-600" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="mb-4 flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white">
+                <UsersIcon className="h-4 w-4" />
               </div>
-              <h3 className="font-semibold text-gray-900 text-sm">Users Breakdown</h3>
+              <h3 className="text-sm font-semibold text-slate-900">Users Breakdown</h3>
             </div>
-            <div className="divide-y divide-gray-50">
+            <div className="divide-y divide-slate-100">
               <BreakdownRow label="Active"        value={stats.users.active}   dot="bg-emerald-400" />
               <BreakdownRow label="Inactive"      value={stats.users.inactive} dot="bg-gray-300" />
               <BreakdownRow label="Pending"       value={stats.users.pending}  dot="bg-amber-400" />
@@ -274,27 +272,27 @@ const Dashboard: React.FC = () => {
               <BreakdownRow label="New (30 days)" value={stats.users.recent}   dot="bg-indigo-400" />
             </div>
           </div>
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-2 bg-emerald-50 rounded-lg">
-                <DocumentTextIcon className="h-4 w-4 text-emerald-600" />
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="mb-4 flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white">
+                <DocumentTextIcon className="h-4 w-4" />
               </div>
-              <h3 className="font-semibold text-gray-900 text-sm">Biodatas</h3>
+              <h3 className="text-sm font-semibold text-slate-900">Biodatas</h3>
             </div>
-            <div className="divide-y divide-gray-50">
+            <div className="divide-y divide-slate-100">
               <BreakdownRow label="Total"    value={stats.biodatas.total}   dot="bg-indigo-400" />
               <BreakdownRow label="Verified" value={stats.biodatas.verified} dot="bg-emerald-400" />
               <BreakdownRow label="Pending"  value={stats.biodatas.pending}  dot="bg-amber-400" />
             </div>
           </div>
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-2 bg-violet-50 rounded-lg">
-                <CreditCardIcon className="h-4 w-4 text-violet-600" />
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="mb-4 flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white">
+                <CreditCardIcon className="h-4 w-4" />
               </div>
-              <h3 className="font-semibold text-gray-900 text-sm">Payments</h3>
+              <h3 className="text-sm font-semibold text-slate-900">Payments</h3>
             </div>
-            <div className="divide-y divide-gray-50">
+            <div className="divide-y divide-slate-100">
               <BreakdownRow label="Total"     value={stats.payments.total}                         dot="bg-indigo-400" />
               <BreakdownRow label="Completed" value={stats.payments.completed}                     dot="bg-emerald-400" />
               <BreakdownRow label="Pending"   value={stats.payments.pending}                       dot="bg-amber-400" />

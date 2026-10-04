@@ -24,13 +24,22 @@ function App() {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/biodatas" element={<Biodatas />} />
+        <Route path="/verified-biodatas" element={<Biodatas />} />
+        <Route path="/featured-biodatas" element={<Biodatas />} />
         <Route path="/payments" element={<Payments />} />
+        <Route path="/transactions" element={<Payments />} />
         <Route path="/refunds" element={<Refunds />} />
         <Route path="/users" element={<Users />} />
+        <Route path="/admins" element={<Users />} />
+        <Route path="/user-status" element={<Users />} />
         <Route path="/contact-purchases" element={<ContactPurchases />} />
+        <Route path="/contact-requests" element={<ContactPurchases />} />
         <Route path="/unverified-biodatas" element={<UnverifiedBiodatas />} />
+        <Route path="/moderation" element={<UnverifiedBiodatas />} />
         <Route path="/templates" element={<TemplateManagement />} />
+        <Route path="/content-management" element={<TemplateManagement />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/system-settings" element={<Settings />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

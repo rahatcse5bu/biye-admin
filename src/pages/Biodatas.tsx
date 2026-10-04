@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   EyeIcon,
   TrashIcon,
@@ -18,6 +18,7 @@ import {
   ShoppingBagIcon,
 } from '@heroicons/react/24/outline'
 import { format } from 'date-fns'
+import { useLocation } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { biodataService, Biodata, BiodataDetail } from '../services/biodataService'
 import { toast } from 'react-toastify'
@@ -407,6 +408,7 @@ const KV: React.FC<{ label: string; value?: string | number | null; pre?: boolea
 /* ── Biodatas Page ─────────────────────────────────────── */
 const Biodatas: React.FC = () => {
   const queryClient = useQueryClient()
+  const location = useLocation()
   const [search, setSearch] = useState('')
   const [bioTypeFilter, setBioTypeFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -414,6 +416,15 @@ const Biodatas: React.FC = () => {
   const limit = 20
   const [viewUserId, setViewUserId] = useState<number | null>(null)
   const [confirmAction, setConfirmAction] = useState<{ id: string; action: string; userId?: number; deleteId?: string } | null>(null)
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const nextStatus = params.get('status') || 'all'
+    setStatusFilter(nextStatus)
+    if (location.pathname === '/featured-biodatas') {
+      setBioTypeFilter('all')
+    }
+  }, [location.pathname, location.search])
 
   const debouncedSearch = useDebounce(search, 400)
 

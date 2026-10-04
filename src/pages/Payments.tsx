@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
-import { MagnifyingGlassIcon, ChevronLeftIcon, ChevronRightIcon, ArrowPathIcon, EyeIcon } from '@heroicons/react/24/outline'
+import React, { useState, useEffect } from 'react'
+import { MagnifyingGlassIcon, ChevronLeftIcon, ChevronRightIcon, EyeIcon, ArrowPathIcon } from '@heroicons/react/24/outline'
 import { format } from 'date-fns'
+import { useLocation } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { paymentService, Payment } from '../services/paymentService'
 import { toast } from 'react-toastify'
@@ -8,11 +9,18 @@ import { XMarkIcon } from '@heroicons/react/24/outline'
 
 const Payments: React.FC = () => {
   const queryClient = useQueryClient()
+  const location = useLocation()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [page, setPage] = useState(1)
   const limit = 20
   const [detailPayment, setDetailPayment] = useState<Payment | null>(null)
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const nextStatus = params.get('status') || 'all'
+    setStatusFilter(nextStatus)
+  }, [location.search])
 
   const { data: res, isLoading, error } = useQuery({
     queryKey: ['payments', { search, status: statusFilter, page, limit }],

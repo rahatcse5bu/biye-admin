@@ -8,6 +8,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   useEffect(() => {
     if (!menuOpen) return
@@ -19,12 +20,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }, [menuOpen])
 
   return (
-    <div className="admin-shell flex h-screen overflow-hidden bg-slate-50">
+    <div className="admin-shell flex h-screen min-h-screen overflow-hidden bg-slate-50">
       {menuOpen && <button className="fixed inset-0 z-30 bg-slate-950/50 lg:hidden" aria-label="Close navigation" onClick={() => setMenuOpen(false)} />}
-      <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} />
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <Header onMenuToggle={() => setMenuOpen(!menuOpen)} menuOpen={menuOpen} />
-        <main className="admin-content flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8">
+      <Sidebar
+        open={menuOpen}
+        collapsed={sidebarCollapsed}
+        onClose={() => setMenuOpen(false)}
+        onToggleCollapse={() => setSidebarCollapsed((value) => !value)}
+      />
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <Header
+          onMenuToggle={() => setMenuOpen(!menuOpen)}
+          menuOpen={menuOpen}
+          onSidebarToggle={() => setSidebarCollapsed((value) => !value)}
+          sidebarCollapsed={sidebarCollapsed}
+        />
+        <main className="admin-content flex-1 min-h-0 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8">
           <div className="mx-auto w-full max-w-[1440px]">{children}</div>
         </main>
       </div>

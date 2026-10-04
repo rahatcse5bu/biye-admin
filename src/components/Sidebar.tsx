@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   ChartBarIcon,
@@ -7,90 +7,244 @@ import {
   ArrowLeftOnRectangleIcon,
   CogIcon,
   DocumentTextIcon,
-  ArrowPathIcon,
-  ShoppingCartIcon,
-  ExclamationCircleIcon,
-  PaintBrushIcon,
+  ChevronDownIcon,
+  ShieldCheckIcon,
+  FolderOpenIcon,
+  BellIcon,
+  ChevronDoubleLeftIcon,
+  ChevronDoubleRightIcon,
 } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../store/authStore'
 
-const navigation = [
+type NavChild = {
+  name: string
+  href: string
+  description?: string
+}
+
+type NavItem = {
+  name: string
+  href?: string
+  icon: React.ElementType
+  children?: NavChild[]
+}
+
+const navigation: NavItem[] = [
   { name: 'Dashboard', href: '/', icon: ChartBarIcon },
-  { name: 'Biodatas', href: '/biodatas', icon: DocumentTextIcon },
-  { name: 'Users', href: '/users', icon: UsersIcon },
-  { name: 'Payments', href: '/payments', icon: CreditCardIcon },
-  { name: 'Contact Purchases', href: '/contact-purchases', icon: ShoppingCartIcon },
-  { name: 'Unverified Biodatas', href: '/unverified-biodatas', icon: ExclamationCircleIcon },
-  { name: 'Refunds', href: '/refunds', icon: ArrowPathIcon },
-  { name: 'Templates', href: '/templates', icon: PaintBrushIcon },
+  {
+    name: 'Users',
+    icon: UsersIcon,
+    children: [
+      { name: 'All Users', href: '/users', description: 'Manage every account' },
+      { name: 'Admins', href: '/admins?role=admin', description: 'Staff and permissions' },
+      { name: 'User Status', href: '/user-status?status=active', description: 'Active and pending users' },
+    ],
+  },
+  {
+    name: 'Biodatas',
+    icon: DocumentTextIcon,
+    children: [
+      { name: 'All Biodatas', href: '/biodatas', description: 'Profile inventory' },
+      { name: 'Verified Biodatas', href: '/verified-biodatas?status=approved', description: 'Approved records' },
+      { name: 'Unverified Biodatas', href: '/unverified-biodatas?status=pending', description: 'Needs moderation' },
+      { name: 'Featured Biodatas', href: '/featured-biodatas?status=approved', description: 'Premium profiles' },
+    ],
+  },
+  {
+    name: 'Moderation',
+    icon: ShieldCheckIcon,
+    children: [
+      { name: 'Moderation Queue', href: '/moderation', description: 'Review pending profiles' },
+      { name: 'AI Review', href: '/moderation?source=ai', description: 'AI generated checks' },
+      { name: 'Photo Cards', href: '/templates', description: 'Visual content review' },
+    ],
+  },
+  {
+    name: 'Payments',
+    icon: CreditCardIcon,
+    children: [
+      { name: 'Transactions', href: '/transactions?status=all', description: 'All payment records' },
+      { name: 'Refunds', href: '/refunds', description: 'Manual reversals' },
+      { name: 'Contact Purchases', href: '/contact-purchases', description: 'Profile contact sales' },
+    ],
+  },
+  {
+    name: 'Engagement',
+    icon: BellIcon,
+    children: [
+      { name: 'Favorites', href: '/biodatas', description: 'Saved profiles' },
+      { name: 'Shortlists', href: '/biodatas', description: 'Match queue' },
+      { name: 'Reactions', href: '/biodatas', description: 'Interest signals' },
+    ],
+  },
+  {
+    name: 'Content',
+    icon: FolderOpenIcon,
+    children: [
+      { name: 'Templates', href: '/templates', description: 'Photocard templates' },
+      { name: 'Content Management', href: '/content-management', description: 'Forms and assets' },
+      { name: 'Uploads', href: '/templates', description: 'Media library' },
+    ],
+  },
   { name: 'Settings', href: '/settings', icon: CogIcon },
 ]
 
-const Sidebar: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => {
+const matchRoute = (location: { pathname: string; search: string }, target: string) => {
+  if (!target) return false
+
+  const [routePath, routeSearch = ''] = target.split('?')
+  const currentSearch = location.search || ''
+  const normalizedSearch = routeSearch ? `?${routeSearch}` : ''
+
+  return location.pathname === routePath && currentSearch === normalizedSearch
+}
+
+const Sidebar: React.FC<{ open: boolean; onClose: () => void; collapsed: boolean; onToggleCollapse: () => void }> = ({ open, onClose, collapsed, onToggleCollapse }) => {
   const location = useLocation()
   const { logout, user } = useAuthStore()
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(navigation.filter((item) => item.children).map((item) => [item.name, true])),
+  )
+
+  useEffect(() => {
+    const activeGroup = navigation.find((item) => item.children?.some((child) => matchRoute(location, child.href)))
+    if (!activeGroup) return
+
+    setExpandedGroups((groups) => ({ ...groups, [activeGroup.name]: true }))
+  }, [location])
 
   return (
-    <aside id="admin-navigation" aria-label="Main navigation" className={`admin-sidebar fixed inset-y-0 left-0 z-40 flex w-64 flex-shrink-0 flex-col transition-transform duration-200 lg:static lg:translate-x-0 ${open ? 'translate-x-0 visible' : '-translate-x-full invisible lg:visible'}`}>
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-slate-800">
-        <div className="w-9 h-9 rounded-xl bg-teal-600 flex items-center justify-center flex-shrink-0 shadow-lg">
-          <span className="text-white font-bold text-sm tracking-tight">PN</span>
+    <aside
+      id="admin-navigation"
+      aria-label="Main navigation"
+      className={`fixed inset-y-0 left-0 z-40 flex h-screen flex-col border-r border-slate-200 bg-white shadow-sm transition-all duration-200 lg:static ${open ? 'translate-x-0 visible' : '-translate-x-full'} lg:translate-x-0 lg:visible ${collapsed ? 'w-20 lg:w-20' : 'w-[260px] lg:w-[260px]'}`}
+    >
+      <div className="flex items-center justify-between border-b border-slate-200 px-3 py-4">
+        <div className="flex items-center gap-3 overflow-hidden">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-black text-sm font-bold tracking-[0.12em] text-white shadow-sm">
+            PN
+          </div>
+          {!collapsed && (
+            <div className="leading-tight">
+              <p className="text-sm font-semibold text-slate-900">PNC Nikah</p>
+              <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">Admin</p>
+            </div>
+          )}
         </div>
-        <div className="leading-tight">
-          <p className="text-white font-semibold text-sm">PNC Nikah</p>
-          <p className="text-slate-400 text-xs">Administration</p>
+
+        <button
+          onClick={onToggleCollapse}
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          className="hidden h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition hover:bg-slate-100 lg:flex"
+        >
+          {collapsed ? <ChevronDoubleRightIcon className="h-4 w-4" /> : <ChevronDoubleLeftIcon className="h-4 w-4" />}
+        </button>
+      </div>
+
+      {!collapsed && (
+        <div className="px-5 pb-3 pt-5">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Workspace</p>
         </div>
-      </div>
-      <div className="px-5 pt-5 pb-2">
-        <p className="text-slate-400 text-[10px] font-semibold uppercase tracking-widest">Workspace</p>
-      </div>
-      <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
+      )}
+
+      <nav className="flex-1 min-h-0 space-y-1.5 overflow-y-auto px-3 pb-2">
         {navigation.map((item) => {
           const isActive =
-            location.pathname === item.href ||
-            (item.href !== '/' && location.pathname.startsWith(item.href))
+            (item.href && (location.pathname === item.href || (item.href !== '/' && location.pathname.startsWith(item.href)))) ||
+            (item.children && item.children.some((child) => matchRoute(location, child.href)))
+
+          if (item.children) {
+            const isExpanded = !collapsed && expandedGroups[item.name]
+
+            return (
+              <div key={item.name} className={`rounded-xl border ${isActive ? 'border-slate-200 bg-slate-50' : 'border-transparent bg-transparent'}`}>
+                <button
+                  type="button"
+                  onClick={() => setExpandedGroups((groups) => ({ ...groups, [item.name]: !groups[item.name] }))}
+                  aria-expanded={isExpanded}
+                  className="flex w-full items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-left text-slate-700 transition hover:bg-slate-100"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <item.icon className="h-4 w-4 flex-shrink-0 text-slate-500" />
+                    {!collapsed && <span className="text-sm font-medium truncate">{item.name}</span>}
+                  </div>
+                  {!collapsed && <ChevronDownIcon className={`h-4 w-4 text-slate-400 transition-transform ${isExpanded ? 'rotate-0' : '-rotate-90'}`} />}
+                </button>
+
+                {isExpanded && (
+                  <div className="space-y-1 px-2 pb-2">
+                    {item.children.map((child) => {
+                      const childActive = matchRoute(location, child.href)
+                      return (
+                        <Link
+                          key={child.name}
+                          to={child.href}
+                          onClick={onClose}
+                          className={`block rounded-lg px-3 py-2 transition-colors ${childActive
+                            ? 'bg-black text-white shadow-sm'
+                            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+                        >
+                          <span className="block text-sm font-medium">{child.name}</span>
+                          {child.description && (
+                            <span className="mt-1 block text-[11px] text-slate-500">{child.description}</span>
+                          )}
+                        </Link>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )
+          }
+
           return (
             <Link
               key={item.name}
-              to={item.href}
+              to={item.href || '/'}
               onClick={onClose}
               aria-current={isActive ? 'page' : undefined}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${isActive
-                  ? 'bg-teal-500/15 text-teal-200 ring-1 ring-inset ring-teal-400/20'
-                  : 'text-slate-400 hover:bg-slate-800 hover:text-slate-100'
-                }`}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${collapsed ? 'justify-center px-0' : ''} ${isActive
+                ? 'bg-black text-white shadow-sm'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              }`}
             >
-              <item.icon
-                className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-teal-300' : 'text-slate-400'}`}
-              />
-              {item.name}
+              <item.icon className={`h-4 w-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-slate-500'}`} />
+              {!collapsed && item.name}
             </Link>
           )
         })}
       </nav>
-      <div className="px-3 pb-4 pt-3 border-t border-slate-800 mt-3 space-y-1">
-        <div className="flex items-center gap-3 px-3 py-2 rounded-lg">
-          <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0">
-            <span className="text-white text-xs font-bold">
-              {user?.email?.[0]?.toUpperCase() || 'A'}
-            </span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-slate-200 text-xs font-medium truncate leading-none">
-              {user?.email || 'admin'}
-            </p>
-            <p className="text-slate-500 text-xs mt-0.5 capitalize">
-              {user?.user_role || 'admin'}
-            </p>
-          </div>
-        </div>
-        <button
-          onClick={() => logout()}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-red-400 transition-colors"
-        >
-          <ArrowLeftOnRectangleIcon className="w-5 h-5 flex-shrink-0" />
-          Sign out
-        </button>
+
+      <div className="border-t border-slate-200 px-3 pb-4 pt-3">
+        {!collapsed ? (
+          <>
+            <div className="flex items-center gap-3 rounded-lg px-3 py-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-xs font-semibold text-white">
+                {user?.email?.[0]?.toUpperCase() || 'A'}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-xs font-medium text-slate-700">{user?.email || 'admin'}</p>
+                <p className="mt-0.5 text-[11px] capitalize text-slate-500">{user?.user_role || 'admin'}</p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => logout()}
+              className="mt-2 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+            >
+              <ArrowLeftOnRectangleIcon className="h-4 w-4 flex-shrink-0" />
+              Sign out
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={() => logout()}
+            className="flex h-10 w-full items-center justify-center rounded-lg text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+            aria-label="Sign out"
+          >
+            <ArrowLeftOnRectangleIcon className="h-4 w-4" />
+          </button>
+        )}
       </div>
     </aside>
   )

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useLocation } from 'react-router-dom'
-import { Bars3Icon, ChevronRightIcon } from '@heroicons/react/24/outline'
+import { Bars3Icon, ChevronRightIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../store/authStore'
 
 const PAGE_TITLES: Record<string, { title: string; description: string }> = {
@@ -15,7 +15,7 @@ const PAGE_TITLES: Record<string, { title: string; description: string }> = {
   '/settings':          { title: 'Settings',            description: 'API and system configuration' },
 }
 
-const Header: React.FC<{ onMenuToggle: () => void; menuOpen: boolean }> = ({ onMenuToggle, menuOpen }) => {
+const Header: React.FC<{ onMenuToggle: () => void; menuOpen: boolean; onSidebarToggle: () => void; sidebarCollapsed: boolean }> = ({ onMenuToggle, menuOpen, onSidebarToggle, sidebarCollapsed }) => {
   const { user } = useAuthStore()
   const location = useLocation()
   const page = PAGE_TITLES[location.pathname] ?? { title: 'Admin Panel', description: 'PNC Nikah Administration' }
@@ -25,6 +25,13 @@ const Header: React.FC<{ onMenuToggle: () => void; menuOpen: boolean }> = ({ onM
       <div className="flex min-w-0 items-center gap-3">
         <button onClick={onMenuToggle} aria-label="Toggle navigation" aria-expanded={menuOpen} aria-controls="admin-navigation" className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 lg:hidden">
           <Bars3Icon className="h-6 w-6" />
+        </button>
+        <button
+          onClick={onSidebarToggle}
+          aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          className="hidden rounded-lg border border-slate-200 p-2 text-slate-600 transition hover:bg-slate-100 lg:inline-flex"
+        >
+          {sidebarCollapsed ? <ChevronDoubleRightIcon className="h-5 w-5" /> : <ChevronDoubleLeftIcon className="h-5 w-5" />}
         </button>
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-xs text-slate-500">
@@ -36,7 +43,7 @@ const Header: React.FC<{ onMenuToggle: () => void; menuOpen: boolean }> = ({ onM
         </div>
       </div>
       <div className="flex flex-shrink-0 items-center gap-3 border-l border-slate-200 pl-4">
-        <div className="flex h-9 w-9 items-center justify-center rounded-full border border-teal-200 bg-teal-50 text-sm font-semibold text-teal-800">
+        <div className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-slate-900 text-sm font-semibold text-white">
           {user?.email?.[0]?.toUpperCase() || 'A'}
         </div>
         <div className="hidden sm:block">
