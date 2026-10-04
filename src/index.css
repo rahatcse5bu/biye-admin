@@ -15,3 +15,43 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+@layer base {
+  body {
+    color: #1e293b;
+    background: #f5f7f9;
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  }
+
+  button, input, select, textarea { font: inherit; }
+  button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+  :focus-visible { outline: 2px solid #0f766e; outline-offset: 3px; }
+  input, select, textarea { accent-color: #0f766e; }
+}
+
+@layer components {
+  .admin-sidebar { background: #132630; }
+  .admin-content { background: #f5f7f9; scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
+  .admin-content h1, .admin-content h2 { font-size: 1.625rem; font-weight: 650; letter-spacing: -0.035em; }
+  .admin-content h3 { letter-spacing: -0.015em; }
+  .admin-content .bg-white.shadow,
+  .admin-content .bg-white.shadow-sm,
+  .admin-content .bg-white.shadow-md {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.875rem;
+    box-shadow: 0 2px 4px -2px rgb(15 23 42 / 0.06);
+  }
+  .admin-content table { width: 100%; }
+  .admin-content thead { background: #f8fafc; }
+  .admin-content th { padding-top: 1rem; padding-bottom: 1rem; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.065em; color: #64748b; }
+  .admin-content td { padding-top: 1rem; padding-bottom: 1rem; }
+  .admin-content tbody tr { transition: background-color 150ms; }
+  .admin-content tbody tr:hover { background: #f8fafc; }
+  .admin-content input:not([type='checkbox']):not([type='radio']),
+  .admin-content select,
+  .admin-content textarea { border-color: #cbd5e1; border-radius: 0.5rem; }
+  .admin-content .text-gray-400 { color: #64748b; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

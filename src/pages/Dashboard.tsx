@@ -21,37 +21,33 @@ import {
 } from 'recharts'
 import { dashboardService, DashboardStats } from '../services/dashboardService'
 
-// ── Stat card ──────────────────────────────────────────────────────────────────
 interface StatCard {
   name: string
   value: string | number
   sub: string
   icon: React.ElementType
-  gradient: string
   iconBg: string
 }
 
-const StatCard: React.FC<StatCard> = ({ name, value, sub, icon: Icon, gradient, iconBg }) => (
+const StatCard: React.FC<StatCard> = ({ name, value, sub, icon: Icon, iconBg }) => (
   <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-    <div className={`h-1 ${gradient}`} />
     <div className="p-5">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm text-gray-500 font-medium">{name}</p>
-          <p className="text-3xl font-bold text-gray-900 mt-1 tracking-tight">
+          <p className="text-3xl font-semibold text-gray-900 mt-1 tracking-tight">
             {typeof value === 'number' ? value.toLocaleString() : value}
           </p>
           <p className="text-xs text-gray-400 mt-1">{sub}</p>
         </div>
-        <div className={`p-3 rounded-xl ${iconBg}`}>
-          <Icon className="h-6 w-6 text-white" />
+        <div className={`p-2.5 rounded-xl ${iconBg}`}>
+          <Icon className="h-5 w-5" />
         </div>
       </div>
     </div>
   </div>
 )
 
-// ── Breakdown row ──────────────────────────────────────────────────────────────
 const BreakdownRow: React.FC<{
   label: string
   value: string | number
@@ -68,7 +64,6 @@ const BreakdownRow: React.FC<{
   </div>
 )
 
-// ── Custom pie label ───────────────────────────────────────────────────────────
 const RADIAN = Math.PI / 180
 const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
   const r = innerRadius + (outerRadius - innerRadius) * 0.5
@@ -82,7 +77,6 @@ const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent
   )
 }
 
-// ── Dashboard ──────────────────────────────────────────────────────────────────
 const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [bioStats, setBioStats] = useState<Record<string, number> | null>(null)
@@ -121,32 +115,28 @@ const Dashboard: React.FC = () => {
           value: stats.users.total,
           sub: `${stats.users.active} active`,
           icon: UsersIcon,
-          gradient: 'bg-gradient-to-r from-indigo-500 to-indigo-600',
-          iconBg: 'bg-indigo-500',
+          iconBg: 'bg-teal-50 text-teal-700',
         },
         {
           name: 'Total Biodatas',
           value: stats.biodatas.total,
           sub: `${stats.biodatas.verified} verified`,
           icon: DocumentTextIcon,
-          gradient: 'bg-gradient-to-r from-emerald-500 to-teal-500',
-          iconBg: 'bg-emerald-500',
+          iconBg: 'bg-emerald-50 text-emerald-700',
         },
         {
           name: 'Revenue',
           value: `৳${stats.payments.revenue.toLocaleString()}`,
           sub: `${stats.payments.completed} completed`,
           icon: CreditCardIcon,
-          gradient: 'bg-gradient-to-r from-violet-500 to-purple-600',
-          iconBg: 'bg-violet-500',
+          iconBg: 'bg-slate-100 text-slate-700',
         },
         {
           name: 'Pending Payments',
           value: stats.payments.pending,
           sub: `${stats.payments.total} total`,
           icon: ClockIcon,
-          gradient: 'bg-gradient-to-r from-amber-400 to-orange-500',
-          iconBg: 'bg-amber-500',
+          iconBg: 'bg-amber-50 text-amber-700',
         },
       ]
     : bioStats
@@ -156,24 +146,21 @@ const Dashboard: React.FC = () => {
           value: bioStats.total || 0,
           sub: 'all submissions',
           icon: DocumentTextIcon,
-          gradient: 'bg-gradient-to-r from-emerald-500 to-teal-500',
-          iconBg: 'bg-emerald-500',
+          iconBg: 'bg-emerald-50 text-emerald-700',
         },
         {
           name: 'পাত্রের বায়োডাটা',
           value: bioStats['পুরুষ'] || 0,
           sub: 'male biodatas',
           icon: UsersIcon,
-          gradient: 'bg-gradient-to-r from-indigo-500 to-indigo-600',
-          iconBg: 'bg-indigo-500',
+          iconBg: 'bg-teal-50 text-teal-700',
         },
         {
           name: 'পাত্রীর বায়োডাটা',
           value: bioStats['মহিলা'] || 0,
           sub: 'female biodatas',
           icon: UsersIcon,
-          gradient: 'bg-gradient-to-r from-pink-500 to-rose-500',
-          iconBg: 'bg-pink-500',
+          iconBg: 'bg-rose-50 text-rose-700',
         },
       ]
     : []
@@ -183,7 +170,7 @@ const Dashboard: React.FC = () => {
         { name: 'Active',   value: stats.users.active,   color: '#10B981' },
         { name: 'Inactive', value: stats.users.inactive, color: '#F59E0B' },
         { name: 'Banned',   value: stats.users.banned,   color: '#EF4444' },
-        { name: 'Pending',  value: stats.users.pending,  color: '#6366F1' },
+        { name: 'Pending',  value: stats.users.pending,  color: '#0f766e' },
       ].filter((d) => d.value > 0)
     : []
 
@@ -195,21 +182,23 @@ const Dashboard: React.FC = () => {
     : []
 
   return (
-    <div className="space-y-6 max-w-screen-xl">
-      {/* Page title */}
+    <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Overview</h2>
-        <p className="text-sm text-gray-400 mt-0.5">Live platform statistics</p>
+        <h2 className="text-2xl font-bold text-gray-900">Platform overview</h2>
+        <p className="text-sm text-gray-400 mt-0.5">A clear view of your community, submissions, and revenue.</p>
       </div>
-
-      {/* Stat cards */}
+      {cards.length === 0 && (
+        <div role="status" className="rounded-xl border border-slate-200 bg-white p-8 text-center">
+          <DocumentTextIcon className="mx-auto mb-3 h-8 w-8 text-slate-400" />
+          <h3 className="font-semibold text-slate-800">Statistics are unavailable</h3>
+          <p className="mt-2 text-sm text-slate-500">Please reload the page to try again.</p>
+        </div>
+      )}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {cards.map((c) => (
           <StatCard key={c.name} {...c} />
         ))}
       </div>
-
-      {/* Charts row */}
       {(pieData.length > 0 || bioBarData.length > 0) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {pieData.length > 0 && (
@@ -222,6 +211,7 @@ const Dashboard: React.FC = () => {
                     data={pieData}
                     cx="50%"
                     cy="50%"
+                    innerRadius={58}
                     outerRadius={95}
                     dataKey="value"
                     labelLine={false}
@@ -258,8 +248,8 @@ const Dashboard: React.FC = () => {
                     contentStyle={{ borderRadius: 10, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}
                   />
                   <Bar dataKey="count" radius={[8, 8, 0, 0]}>
-                    <Cell fill="#6366f1" />
-                    <Cell fill="#ec4899" />
+                    <Cell fill="#0f766e" />
+                    <Cell fill="#94b8b2" />
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
@@ -267,11 +257,8 @@ const Dashboard: React.FC = () => {
           )}
         </div>
       )}
-
-      {/* Breakdown panels */}
       {stats && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {/* Users */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div className="flex items-center gap-2 mb-4">
               <div className="p-2 bg-indigo-50 rounded-lg">
@@ -287,8 +274,6 @@ const Dashboard: React.FC = () => {
               <BreakdownRow label="New (30 days)" value={stats.users.recent}   dot="bg-indigo-400" />
             </div>
           </div>
-
-          {/* Biodatas */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div className="flex items-center gap-2 mb-4">
               <div className="p-2 bg-emerald-50 rounded-lg">
@@ -302,8 +287,6 @@ const Dashboard: React.FC = () => {
               <BreakdownRow label="Pending"  value={stats.biodatas.pending}  dot="bg-amber-400" />
             </div>
           </div>
-
-          {/* Payments */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div className="flex items-center gap-2 mb-4">
               <div className="p-2 bg-violet-50 rounded-lg">

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useLocation } from 'react-router-dom'
-import { BellIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import { Bars3Icon, ChevronRightIcon } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../store/authStore'
 
 const PAGE_TITLES: Record<string, { title: string; description: string }> = {
@@ -10,49 +10,38 @@ const PAGE_TITLES: Record<string, { title: string; description: string }> = {
   '/payments':          { title: 'Payments',            description: 'Track transactions and revenue' },
   '/contact-purchases': { title: 'Contact Purchases',   description: 'View contact purchase history' },
   '/refunds':           { title: 'Refunds',             description: 'Process bKash refunds' },
+  '/unverified-biodatas': { title: 'Unverified Biodatas', description: 'Review submissions awaiting verification' },
+  '/templates': { title: 'Templates', description: 'Manage biodata forms and fields' },
   '/settings':          { title: 'Settings',            description: 'API and system configuration' },
 }
 
-const Header: React.FC = () => {
+const Header: React.FC<{ onMenuToggle: () => void; menuOpen: boolean }> = ({ onMenuToggle, menuOpen }) => {
   const { user } = useAuthStore()
   const location = useLocation()
   const page = PAGE_TITLES[location.pathname] ?? { title: 'Admin Panel', description: 'PNC Nikah Administration' }
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
-      <div>
-        <h1 className="text-xl font-semibold text-gray-900">{page.title}</h1>
-        <p className="text-xs text-gray-400 mt-0.5">{page.description}</p>
-      </div>
-
-      <div className="flex items-center gap-2">
-        {/* Search hint */}
-        <div className="hidden md:flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-400 mr-2 w-44 cursor-default">
-          <MagnifyingGlassIcon className="w-4 h-4" />
-          <span className="text-xs">Quick search…</span>
-        </div>
-
-        {/* Bell */}
-        <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-          <BellIcon className="w-5 h-5" />
+    <header className="flex h-20 flex-shrink-0 items-center justify-between gap-4 border-b border-slate-200 bg-white px-4 sm:px-6 lg:px-8">
+      <div className="flex min-w-0 items-center gap-3">
+        <button onClick={onMenuToggle} aria-label="Toggle navigation" aria-expanded={menuOpen} aria-controls="admin-navigation" className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 lg:hidden">
+          <Bars3Icon className="h-6 w-6" />
         </button>
-
-        {/* Divider */}
-        <div className="h-8 w-px bg-gray-200 mx-1" />
-
-        {/* User */}
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-sm">
-            <span className="text-white text-xs font-bold">
-              {user?.email?.[0]?.toUpperCase() || 'A'}
-            </span>
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 text-xs text-slate-500">
+            <span className="hidden sm:inline">Workspace</span>
+            <ChevronRightIcon className="hidden h-3 w-3 sm:block" />
+            <span className="font-medium text-slate-800">{page.title}</span>
           </div>
-          <div className="hidden sm:block leading-tight">
-            <p className="text-sm font-medium text-gray-800 leading-none">
-              {user?.user_name || 'Admin'}
-            </p>
-            <p className="text-xs text-gray-400 mt-0.5 capitalize">{user?.user_role || 'admin'}</p>
-          </div>
+          <p className="mt-1 truncate text-xs text-slate-500">{page.description}</p>
+        </div>
+      </div>
+      <div className="flex flex-shrink-0 items-center gap-3 border-l border-slate-200 pl-4">
+        <div className="flex h-9 w-9 items-center justify-center rounded-full border border-teal-200 bg-teal-50 text-sm font-semibold text-teal-800">
+          {user?.email?.[0]?.toUpperCase() || 'A'}
+        </div>
+        <div className="hidden sm:block">
+          <p className="text-sm font-semibold text-slate-800">{user?.user_name || 'Admin'}</p>
+          <p className="mt-0.5 text-xs capitalize text-slate-500">{user?.user_role || 'admin'}</p>
         </div>
       </div>
     </header>

@@ -78,56 +78,43 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen flex bg-slate-900">
-      {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 relative overflow-hidden">
-        {/* Decorative circles */}
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 bg-[#132c36] relative overflow-hidden">
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-white/5 rounded-full" />
         <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-white/5 rounded-full" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/5 rounded-full" />
-
-        {/* Logo */}
         <div className="relative flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
             <span className="text-white font-bold text-base">PN</span>
           </div>
           <div>
             <p className="text-white font-semibold text-lg leading-none">PNC Nikah</p>
-            <p className="text-indigo-200 text-xs mt-0.5">Admin Portal</p>
+            <p className="text-teal-200 text-xs mt-0.5">Admin Portal</p>
           </div>
         </div>
-
-        {/* Headline */}
         <div className="relative space-y-4">
           <h1 className="text-4xl font-bold text-white leading-tight">
-            Manage your<br />platform with ease.
+            A thoughtful space.<br />A connected community.
           </h1>
-          <p className="text-indigo-200 text-base leading-relaxed max-w-sm">
+          <p className="text-teal-200 text-base leading-relaxed max-w-sm">
             Full control over biodatas, users, payments, and refunds — all in one place.
           </p>
           <div className="flex items-center gap-2 pt-2">
-            <ShieldCheckIcon className="h-5 w-5 text-indigo-300" />
-            <span className="text-indigo-300 text-sm">Restricted to admin accounts only</span>
+            <ShieldCheckIcon className="h-5 w-5 text-teal-300" />
+            <span className="text-teal-300 text-sm">Restricted to admin accounts only</span>
           </div>
         </div>
-
-        {/* Footer quote */}
-        <p className="relative text-indigo-300/60 text-xs">© 2025 PNC Soft Tech. All rights reserved.</p>
+        <p className="relative text-teal-300/60 text-xs">© {new Date().getFullYear()} PNC Soft Tech. All rights reserved.</p>
       </div>
-
-      {/* Right panel */}
       <div className="flex-1 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-sm space-y-8">
-          {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-4">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-teal-700 flex items-center justify-center">
               <span className="text-white font-bold text-sm">PN</span>
             </div>
             <p className="text-gray-900 font-semibold">PNC Nikah Admin</p>
           </div>
-
-          {/* Heading */}
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Sign in</h2>
+            <h2 className="text-2xl font-bold text-gray-900">Welcome back</h2>
             <p className="mt-1 text-sm text-gray-500">
               {useEmailLogin ? 'Use your admin credentials' : 'Use your admin Google account'} to continue
             </p>
@@ -135,14 +122,13 @@ const Login: React.FC = () => {
 
           {!useEmailLogin ? (
             <>
-              {/* Google button */}
               <div
                 className="flex min-h-11 items-center justify-center overflow-hidden rounded-xl"
                 aria-busy={isLoading}
               >
                 {isLoading ? (
                   <div
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-teal-600"
                     role="status"
                   >
                     <svg className="w-4 h-4 animate-spin text-gray-400" fill="none" viewBox="0 0 24 24">
@@ -167,8 +153,6 @@ const Login: React.FC = () => {
               <p className="text-center text-xs text-gray-400">
                 Only accounts with <span className="font-semibold text-gray-600">admin</span> privileges can access this panel.
               </p>
-
-              {/* Divider */}
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300"></div>
@@ -177,18 +161,15 @@ const Login: React.FC = () => {
                   <span className="px-2 bg-white text-gray-500">Or</span>
                 </div>
               </div>
-
-              {/* Switch to email login */}
               <button
                 onClick={() => setUseEmailLogin(true)}
-                className="w-full px-5 py-3 border-2 border-indigo-200 rounded-xl text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 hover:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all"
+                className="w-full px-5 py-3 border-2 border-teal-200 rounded-xl text-sm font-medium text-teal-600 bg-teal-50 hover:bg-teal-100 hover:border-teal-300 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-all"
               >
                 Sign in with email
               </button>
             </>
           ) : (
             <>
-              {/* Email/Password form */}
               <form onSubmit={handleDirectSignIn} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -199,7 +180,7 @@ const Login: React.FC = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="admin@example.com"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                     required
                   />
                 </div>
@@ -213,7 +194,7 @@ const Login: React.FC = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                     required
                   />
                 </div>
@@ -221,7 +202,7 @@ const Login: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-2 px-5 py-2.5 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
                     <>
@@ -236,11 +217,9 @@ const Login: React.FC = () => {
                   )}
                 </button>
               </form>
-
-              {/* Switch back to Google */}
               <button
                 onClick={() => setUseEmailLogin(false)}
-                className="w-full px-5 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all"
+                className="w-full px-5 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-all"
               >
                 Back to Google sign-in
               </button>

@@ -26,29 +26,24 @@ const navigation = [
   { name: 'Settings', href: '/settings', icon: CogIcon },
 ]
 
-const Sidebar: React.FC = () => {
+const Sidebar: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => {
   const location = useLocation()
   const { logout, user } = useAuthStore()
 
   return (
-    <div className="flex flex-col w-64 bg-slate-900 flex-shrink-0">
-      {/* Logo */}
+    <aside id="admin-navigation" aria-label="Main navigation" className={`admin-sidebar fixed inset-y-0 left-0 z-40 flex w-64 flex-shrink-0 flex-col transition-transform duration-200 lg:static lg:translate-x-0 ${open ? 'translate-x-0 visible' : '-translate-x-full invisible lg:visible'}`}>
       <div className="flex items-center gap-3 px-5 py-5 border-b border-slate-800">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-lg">
+        <div className="w-9 h-9 rounded-xl bg-teal-600 flex items-center justify-center flex-shrink-0 shadow-lg">
           <span className="text-white font-bold text-sm tracking-tight">PN</span>
         </div>
         <div className="leading-tight">
           <p className="text-white font-semibold text-sm">PNC Nikah</p>
-          <p className="text-slate-500 text-xs">Admin Portal</p>
+          <p className="text-slate-400 text-xs">Administration</p>
         </div>
       </div>
-
-      {/* Nav label */}
       <div className="px-5 pt-5 pb-2">
-        <p className="text-slate-600 text-[10px] font-semibold uppercase tracking-widest">Menu</p>
+        <p className="text-slate-400 text-[10px] font-semibold uppercase tracking-widest">Workspace</p>
       </div>
-
-      {/* Nav items */}
       <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
         {navigation.map((item) => {
           const isActive =
@@ -58,24 +53,24 @@ const Sidebar: React.FC = () => {
             <Link
               key={item.name}
               to={item.href}
+              onClick={onClose}
+              aria-current={isActive ? 'page' : undefined}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${isActive
-                  ? 'bg-indigo-600 text-white shadow-sm'
+                  ? 'bg-teal-500/15 text-teal-200 ring-1 ring-inset ring-teal-400/20'
                   : 'text-slate-400 hover:bg-slate-800 hover:text-slate-100'
                 }`}
             >
               <item.icon
-                className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-indigo-200' : 'text-slate-500'}`}
+                className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-teal-300' : 'text-slate-400'}`}
               />
               {item.name}
             </Link>
           )
         })}
       </nav>
-
-      {/* User + logout */}
       <div className="px-3 pb-4 pt-3 border-t border-slate-800 mt-3 space-y-1">
         <div className="flex items-center gap-3 px-3 py-2 rounded-lg">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0">
             <span className="text-white text-xs font-bold">
               {user?.email?.[0]?.toUpperCase() || 'A'}
             </span>
@@ -94,10 +89,10 @@ const Sidebar: React.FC = () => {
           className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-red-400 transition-colors"
         >
           <ArrowLeftOnRectangleIcon className="w-5 h-5 flex-shrink-0" />
-          Logout
+          Sign out
         </button>
       </div>
-    </div>
+    </aside>
   )
 }
 
