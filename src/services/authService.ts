@@ -2,8 +2,11 @@ import api from './api'
 
 interface LoginCredentials {
   email: string
-  token_id: string
-  user_role: string
+  password: string
+}
+
+interface GoogleAuthCredentials {
+  credential: string
 }
 
 interface LoginResponse {
@@ -18,9 +21,18 @@ interface LoginResponse {
 }
 
 export const authService = {
-  // Admin login using existing user API
+  // Admin email/password login using existing user API
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
-    const response = await api.post('/api/v1/user-info/create-login-user/app', credentials)
+    const response = await api.post('/api/v1/user-info/login', credentials)
+    const { token, ...user } = response.data.data
+    return { token, user }
+  },
+
+  // Admin Google login using existing user API
+  googleAuth: async (
+    credentials: GoogleAuthCredentials
+  ): Promise<LoginResponse> => {
+    const response = await api.post('/api/v1/user-info/google-auth', credentials)
     const { token, ...user } = response.data.data
     return { token, user }
   },
