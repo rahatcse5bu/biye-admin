@@ -126,11 +126,11 @@ const Notifications: React.FC = () => {
         onClick={() => void toggle()}
         aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ""}`}
         aria-expanded={open}
-        className="relative flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 transition hover:bg-green-50 hover:text-green-800"
+        className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700 shadow-sm transition hover:border-green-300 hover:bg-green-100 hover:text-green-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400"
       >
-        <BellIcon className="h-5 w-5" />
+        <BellIcon className="h-5 w-5 stroke-[2.2]" />
         {unreadCount > 0 && (
-          <span className="absolute -right-1 -top-1 min-w-4 rounded-full bg-green-800 px-1 text-center text-[10px] font-bold leading-4 text-white">
+          <span className="absolute -right-1 -top-1 min-w-4 rounded-full bg-green-800 px-1 text-center text-[10px] font-bold leading-4 text-white shadow-sm">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
