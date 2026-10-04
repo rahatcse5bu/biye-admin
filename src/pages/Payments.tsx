@@ -58,7 +58,7 @@ const Payments: React.FC = () => {
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["payments"] });
       toast.success(
-        `Refunded via bKash (Refund TrxID: ${result?.data?.refundTrxID}). ${result?.data?.pointsRemoved ?? 0} points removed.`,
+        `Refunded via bKash (Refund TrxID: ${result?.data?.refundTrxID}). ${result?.data?.pointsRemoved ?? 0} points removed${result?.data?.pointsBalance != null ? `, new balance ${result.data.pointsBalance}` : ""}.`,
       );
     },
     onError: (error: any) =>
@@ -79,7 +79,7 @@ const Payments: React.FC = () => {
             <dd>{p.points ?? 0} will be removed</dd>
           </dl>
           <p className="mt-3">
-            The money is returned to the customer through bKash. This cannot be undone.
+            The money is returned to the customer through bKash and all purchased points are removed, even if that makes their balance negative. This cannot be undone.
           </p>
         </>
       ),

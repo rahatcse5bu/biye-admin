@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { ArrowPathIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { refundService } from '../services/refundService'
 import { toast } from 'react-toastify'
+import RefundRequestsPanel from '../components/RefundRequestsPanel'
 
 const Refunds: React.FC = () => {
   const [trxID, setTrxID] = useState('')
@@ -54,8 +55,10 @@ const Refunds: React.FC = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-gray-900">bKash Refunds</h1>
-        <p className="mt-1 text-gray-500">Search bKash transactions and process refunds</p>
+        <p className="mt-1 text-gray-500">Review user refund requests, or search bKash transactions and refund manually</p>
       </div>
+
+      <RefundRequestsPanel />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Search Transaction */}
@@ -122,7 +125,7 @@ const Refunds: React.FC = () => {
       {/* Info */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
         <strong>How it works:</strong> Search for a bKash transaction first, then refund the full amount using its Payment ID.
-        If the payment was made on this site, it is marked Refunded and its purchased points are removed from the user (never below zero).
+        If the payment was made on this site, it is marked Refunded and all of its purchased points are removed from the user (the balance can go negative if some were already spent).
       </div>
     </div>
   )
