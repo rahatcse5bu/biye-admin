@@ -9,6 +9,7 @@ import {
   ArrowLeftOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import { useAuthStore } from "../store/authStore";
+import Notifications from "./Notifications";
 
 const PAGE_TITLES: Record<string, { title: string; description: string }> = {
   "/": { title: "Dashboard", description: "Platform overview & analytics" },
@@ -109,7 +110,9 @@ const Header: React.FC<{
           </p>
         </div>
       </div>
-      <div ref={profileRef} className="relative flex flex-shrink-0 items-center border-l border-slate-200 pl-4">
+      <div className="flex flex-shrink-0 items-center gap-3 border-l border-slate-200 pl-4">
+        <Notifications />
+        <div ref={profileRef} className="relative flex items-center">
         <button
           type="button"
           onClick={() => setProfileOpen((open) => !open)}
@@ -144,6 +147,7 @@ const Header: React.FC<{
             </button>
           </div>
         )}
+        </div>
       </div>
     </header>
   );
