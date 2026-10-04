@@ -1,27 +1,33 @@
-import React, { useEffect, useState } from 'react'
-import Sidebar from './Sidebar'
-import Header from './Header'
+import React, { useEffect, useState } from "react";
+import Sidebar from "./Sidebar";
+import Header from "./Header";
 
 interface LayoutProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
-    if (!menuOpen) return
+    if (!menuOpen) return;
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setMenuOpen(false)
-    }
-    document.addEventListener('keydown', closeOnEscape)
-    return () => document.removeEventListener('keydown', closeOnEscape)
-  }, [menuOpen])
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [menuOpen]);
 
   return (
     <div className="admin-shell flex h-screen min-h-screen overflow-hidden bg-slate-50">
-      {menuOpen && <button className="fixed inset-0 z-30 bg-slate-950/50 lg:hidden" aria-label="Close navigation" onClick={() => setMenuOpen(false)} />}
+      {menuOpen && (
+        <button
+          className="fixed inset-0 z-30 bg-slate-950/50 lg:hidden"
+          aria-label="Close navigation"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
       <Sidebar
         open={menuOpen}
         collapsed={sidebarCollapsed}
@@ -40,7 +46,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </main>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;

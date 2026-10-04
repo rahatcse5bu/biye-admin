@@ -1,22 +1,22 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
-import Layout from './components/Layout'
-import Dashboard from './pages/Dashboard'
-import Biodatas from './pages/Biodatas'
-import Payments from './pages/Payments'
-import Refunds from './pages/Refunds'
-import Users from './pages/Users'
-import Settings from './pages/Settings'
-import ContactPurchases from './pages/ContactPurchases'
-import UnverifiedBiodatas from './pages/UnverifiedBiodatas'
-import TemplateManagement from './pages/TemplateManagement'
-import Login from './pages/Login'
-import { useAuthStore } from './store/authStore'
+import { Routes, Route, Navigate } from "react-router-dom";
+import Layout from "./components/Layout";
+import Dashboard from "./pages/Dashboard";
+import Biodatas from "./pages/Biodatas";
+import Payments from "./pages/Payments";
+import Refunds from "./pages/Refunds";
+import Users from "./pages/Users";
+import Settings from "./pages/Settings";
+import ContactPurchases from "./pages/ContactPurchases";
+import UnverifiedBiodatas from "./pages/UnverifiedBiodatas";
+import TemplateManagement from "./pages/TemplateManagement";
+import Login from "./pages/Login";
+import { useAuthStore } from "./store/authStore";
 
 function App() {
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated } = useAuthStore();
 
   if (!isAuthenticated) {
-    return <Login />
+    return <Login />;
   }
 
   return (
@@ -43,7 +43,7 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>
-  )
+  );
 }
 
-export default App
+export default App;
