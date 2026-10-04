@@ -12,6 +12,13 @@ export interface PointsPackage {
 
 export type PointsPackageInput = Omit<PointsPackage, '_id'>
 
+export interface CustomPointsSettings {
+  enabled: boolean
+  points_per_taka: number
+  min_amount: number
+  max_amount: number
+}
+
 export const pointsPackageService = {
   list: async (): Promise<PointsPackage[]> => {
     const res = await api.get('/api/v1/points-packages/admin')
@@ -30,5 +37,15 @@ export const pointsPackageService = {
 
   remove: async (id: string) => {
     await api.delete(`/api/v1/points-packages/${id}`)
+  },
+
+  getCustomSettings: async (): Promise<CustomPointsSettings> => {
+    const res = await api.get('/api/v1/points-packages/custom-settings')
+    return res.data.data
+  },
+
+  updateCustomSettings: async (data: CustomPointsSettings) => {
+    const res = await api.patch('/api/v1/points-packages/custom-settings', data)
+    return res.data.data as CustomPointsSettings
   },
 }

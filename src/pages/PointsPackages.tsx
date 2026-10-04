@@ -14,6 +14,7 @@ import {
   pointsPackageService,
 } from '../services/pointsPackageService'
 import { useConfirm } from '../components/ConfirmDialog'
+import CustomPointsSettingsPanel from '../components/CustomPointsSettingsPanel'
 
 type FormState = {
   name: string
@@ -152,6 +153,8 @@ const PointsPackages: React.FC = () => {
           New Package
         </button>
       </div>
+
+      <CustomPointsSettingsPanel />
 
       <div className="overflow-x-auto rounded-xl bg-white shadow">
         {isLoading ? (
