@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../services/api';
+import { svgToImgSrc } from '../utils/svgPreview';
 import { FiPlus, FiEdit2, FiTrash2, FiEye } from 'react-icons/fi';
 import { useConfirm } from '../components/ConfirmDialog';
 
@@ -27,8 +28,6 @@ const TemplateManagement: React.FC = () => {
     const [editSvgCode, setEditSvgCode] = useState('');
     const [editBioType, setEditBioType] = useState<'supply' | 'demand'>('supply');
 
-    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-    const ENDPOINT_BASE = `${API_BASE_URL}/api/v1`;
 
     // Fetch all templates
     useEffect(() => {
@@ -38,7 +37,7 @@ const TemplateManagement: React.FC = () => {
     const fetchTemplates = async () => {
         try {
             setLoading(true);
-            const res = await axios.get(`${ENDPOINT_BASE}/photocard-templates`);
+            const res = await api.get('/api/v1/photocard-templates');
             setTemplates(res.data.data);
         } catch (error) {
             console.error('Error fetching templates:', error);
@@ -83,11 +82,11 @@ const TemplateManagement: React.FC = () => {
 
             if (selectedTemplate?._id) {
                 // Update existing
-                await axios.put(`${ENDPOINT_BASE}/photocard-templates/${selectedTemplate._id}`, payload);
+                await api.put(`/api/v1/photocard-templates/${selectedTemplate._id}`, payload);
                 alert('Template updated successfully');
             } else {
                 // Create new
-                await axios.post(`${ENDPOINT_BASE}/photocard-templates`, payload);
+                await api.post('/api/v1/photocard-templates', payload);
                 alert('Template created successfully');
             }
 
@@ -108,7 +107,7 @@ const TemplateManagement: React.FC = () => {
         if (!ok) return;
 
         try {
-            await axios.delete(`${ENDPOINT_BASE}/photocard-templates/${templateId}`);
+            await api.delete(`/api/v1/photocard-templates/${templateId}`);
             alert('Template deleted');
             fetchTemplates();
         } catch (error) {
@@ -212,8 +211,9 @@ const TemplateManagement: React.FC = () => {
                             </div>
                             <div className="p-4">
                                 <div className="bg-gray-100 rounded p-4 overflow-auto max-h-80">
-                                    <svg
-                                        dangerouslySetInnerHTML={{ __html: selectedTemplate.svgCode }}
+                                    <img
+                                        src={svgToImgSrc(selectedTemplate.svgCode)}
+                                        alt={`${selectedTemplate.name} preview`}
                                         style={{ maxWidth: '100%', height: 'auto' }}
                                     />
                                 </div>
@@ -312,12 +312,9 @@ const TemplateManagement: React.FC = () => {
                         <h3 className="font-bold mb-3">Preview</h3>
                         <div className="bg-white border rounded p-3 overflow-auto max-h-96">
                             {editSvgCode ? (
-                                <svg
-                                    dangerouslySetInnerHTML={{
-                                        __html: editSvgCode
-                                            .replace(/\{[^}]+\}/g, 'দৃষ্টান্ত')
-                                            .slice(0, 5000),
-                                    }}
+                                <img
+                                    src={svgToImgSrc(editSvgCode.replace(/\{[^}]+\}/g, 'দৃষ্টান্ত'))}
+                                    alt="Template preview"
                                     style={{ maxWidth: '100%', height: 'auto' }}
                                 />
                             ) : (

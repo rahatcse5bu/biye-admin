@@ -25,6 +25,8 @@ import {
 import { toast } from "react-toastify";
 import DynamicFieldBuilder from "../components/DynamicFieldBuilder/DynamicFieldBuilder";
 import { parseFieldsWithLLM } from "../services/llmFieldParser";
+import { svgToImgSrc } from "../utils/svgPreview";
+import api from "../services/api";
 import { useConfirm } from "../components/ConfirmDialog";
 
 /* ════════════════════════════════════════════════
@@ -1164,11 +1166,11 @@ const UnverifiedBiodatas: React.FC = () => {
     setGeneratingPhotocard(true);
     setPhotocardItem(biodata);
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/v1/photocard/${biodata._id}`,
-      );
-      if (!response.ok) throw new Error("Failed to generate photocard");
-      const svgText = await response.text();
+      const response = await api.get(`/api/v1/photocard/${biodata._id}`, {
+        responseType: "text",
+        timeout: 60000,
+      });
+      const svgText = String(response.data);
       setPhotocardSVG(svgText);
       setShowPhotocardModal(true);
       toast.success("Photocard generated!");
@@ -1487,10 +1489,9 @@ const UnverifiedBiodatas: React.FC = () => {
             <div className="p-6 space-y-4">
               {/* SVG Preview */}
               <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-                <div
-                  dangerouslySetInnerHTML={{ __html: photocardSVG }}
-                  className="flex justify-center"
-                />
+                <div className="flex justify-center">
+                  <img src={svgToImgSrc(photocardSVG)} alt="Photocard preview" className="h-auto max-w-full" />
+                </div>
               </div>
 
               {/* Info */}
