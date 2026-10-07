@@ -145,6 +145,11 @@ const navigation: NavItem[] = [
         description: "Photocard templates",
       },
       {
+        name: "Default Questions",
+        href: "/default-questions",
+        description: "Proposal questions by religion",
+      },
+      {
         name: "Content Management",
         href: "/content-management",
         description: "Forms and assets",

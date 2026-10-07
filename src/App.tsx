@@ -10,6 +10,7 @@ import ContactPurchases from "./pages/ContactPurchases";
 import UnverifiedBiodatas from "./pages/UnverifiedBiodatas";
 import TemplateManagement from "./pages/TemplateManagement";
 import PointsPackages from "./pages/PointsPackages";
+import DefaultQuestions from "./pages/DefaultQuestions";
 import Login from "./pages/Login";
 import { useAuthStore } from "./store/authStore";
 
@@ -39,6 +40,7 @@ function App() {
         <Route path="/unverified-biodatas" element={<UnverifiedBiodatas />} />
         <Route path="/moderation" element={<UnverifiedBiodatas />} />
         <Route path="/templates" element={<TemplateManagement />} />
+        <Route path="/default-questions" element={<DefaultQuestions />} />
         <Route path="/content-management" element={<TemplateManagement />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/system-settings" element={<Settings />} />
