@@ -11,30 +11,31 @@ export interface AdminNotification {
   createdAt: string;
 }
 
+// TODO: scope=admin asks for the admin feed; without it the backend returns the personal feed.
 export const notificationService = {
   list: async (): Promise<AdminNotification[]> => {
-    const response = await api.get("/api/v1/notifications?limit=30");
+    const response = await api.get("/api/v1/notifications?limit=30&scope=admin");
     return response.data.data || [];
   },
 
   unreadCount: async (): Promise<number> => {
-    const response = await api.get("/api/v1/notifications/unread-count");
+    const response = await api.get("/api/v1/notifications/unread-count?scope=admin");
     return response.data.data?.count || 0;
   },
 
   markRead: async (id: string) => {
-    await api.patch(`/api/v1/notifications/${id}/read`);
+    await api.patch(`/api/v1/notifications/${id}/read?scope=admin`);
   },
 
   markAllRead: async () => {
-    await api.patch("/api/v1/notifications/read-all");
+    await api.patch("/api/v1/notifications/read-all?scope=admin");
   },
 
   createRealtimeClient: () =>
     new Ably.Realtime({
       authCallback: async (_params, callback) => {
         try {
-          const response = await api.get("/api/v1/notifications/ably-token");
+          const response = await api.get("/api/v1/notifications/ably-token?scope=admin");
           callback(null, response.data.data);
         } catch (error) {
           callback(error as any, null);
