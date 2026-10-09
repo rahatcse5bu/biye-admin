@@ -1095,6 +1095,10 @@ const BiodataFormModal: React.FC<{
   );
 };
 
+// TODO: public page is keyed by Mongo _id, not bio_id.
+const SITE_URL = (import.meta.env.VITE_SITE_URL || "https://www.bibaho.org").replace(/\/+$/, "");
+const biodataDetailsUrl = (id: string) => `${SITE_URL}/biodata/unverified/${id}`;
+
 /* ════════════════════════════════════════════════
    MAIN PAGE
    ════════════════════════════════════════════════ */
@@ -1121,10 +1125,12 @@ const UnverifiedBiodatas: React.FC = () => {
 
   const createMut = useMutation({
     mutationFn: unverifiedBiodataService.create,
-    onSuccess: () => {
+    onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ["unverified-biodatas"] });
       toast.success("Unverified biodata created!");
       setShowForm(false);
+      const id = res?.data?._id;
+      if (id) window.location.assign(biodataDetailsUrl(id));
     },
     onError: () => toast.error("Failed to create biodata"),
   });
@@ -1528,7 +1534,7 @@ const UnverifiedBiodatas: React.FC = () => {
                   🔗 Biodata URL
                 </p>
                 <code className="block bg-white p-2 rounded border border-amber-200 text-amber-900 mt-1 break-all">
-                  https://bibaho.org/biodata/unverified/{photocardItem?.bio_id}
+                  {photocardItem && biodataDetailsUrl(photocardItem._id)}
                 </code>
               </div>
             </div>
