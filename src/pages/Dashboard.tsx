@@ -21,6 +21,7 @@ import {
   Legend,
 } from "recharts";
 import { dashboardService, DashboardStats } from "../services/dashboardService";
+import EmailUsagePanel from "../components/EmailUsagePanel";
 
 interface StatCard {
   name: string;
@@ -245,6 +246,7 @@ const Dashboard: React.FC = () => {
           <StatCard key={c.name} {...c} />
         ))}
       </div>
+      <EmailUsagePanel />
       {(pieData.length > 0 || bioBarData.length > 0) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {pieData.length > 0 && (

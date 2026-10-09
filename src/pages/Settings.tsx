@@ -1,5 +1,6 @@
 import React from 'react'
 import EmailBrandingPanel from '../components/EmailBrandingPanel'
+import ReminderSettingsPanel from '../components/ReminderSettingsPanel'
 
 const Settings: React.FC = () => {
   return (
@@ -10,6 +11,8 @@ const Settings: React.FC = () => {
       </div>
 
       <EmailBrandingPanel />
+
+      <ReminderSettingsPanel />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* API Endpoints Info */}
