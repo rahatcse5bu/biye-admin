@@ -16,7 +16,7 @@ const Settings: React.FC = () => {
         <div className="bg-white shadow rounded-xl p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">🌐 API Configuration</h2>
           <div className="space-y-3 text-sm">
-            <InfoRow label="Production API" value="https://server.pncnikah.com" />
+            <InfoRow label="API Server" value={import.meta.env.VITE_API_URL || "https://biye-backend.vercel.app"} />
             <InfoRow label="Admin API" value="/api/admin/*" />
             <InfoRow label="User API" value="/api/v1/user-info/*" />
             <InfoRow label="Biodata API" value="/api/v1/general-info, /api/v1/bio-data/*" />
