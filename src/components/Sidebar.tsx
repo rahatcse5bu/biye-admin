@@ -10,9 +10,11 @@ import {
   ShieldCheckIcon,
   FolderOpenIcon,
   BellIcon,
+  ChatBubbleLeftRightIcon,
 } from "@heroicons/react/24/outline";
 import { useQuery } from "@tanstack/react-query";
 import { dashboardService } from "../services/dashboardService";
+import { contactMessageService } from "../services/contactMessageService";
 
 type NavChild = {
   name: string;
@@ -28,6 +30,7 @@ type NavItem = {
 };
 
 const PENDING_BIODATAS_HREF = "/biodatas?status=pending";
+const CONTACT_MESSAGES_HREF = "/contact-messages";
 
 const navigation: NavItem[] = [
   { name: "Dashboard", href: "/", icon: ChartBarIcon },
@@ -157,6 +160,7 @@ const navigation: NavItem[] = [
       { name: "Uploads", href: "/templates", description: "Media library" },
     ],
   },
+  { name: "Messages", href: CONTACT_MESSAGES_HREF, icon: ChatBubbleLeftRightIcon },
   { name: "Settings", href: "/settings", icon: CogIcon },
 ];
 
@@ -187,6 +191,14 @@ const Sidebar: React.FC<{
     refetchOnWindowFocus: true,
   });
   const badgeText = pendingBiodatas > 99 ? "99+" : String(pendingBiodatas);
+  // TODO: key sits under "contact-messages" so actions on the Messages page refresh the badge.
+  const { data: unreadMessages = 0 } = useQuery({
+    queryKey: ["contact-messages", "unread-count"],
+    queryFn: contactMessageService.unreadCount,
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
+  });
+  const messagesBadge = unreadMessages > 99 ? "99+" : String(unreadMessages);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
     () =>
       Object.fromEntries(
@@ -351,10 +363,25 @@ const Sidebar: React.FC<{
                   : "text-slate-600 hover:bg-green-50 hover:text-green-900"
               }`}
             >
-              <item.icon
-                className={`h-4 w-4 flex-shrink-0 ${isActive ? "text-white" : "text-slate-500"}`}
-              />
-              {!collapsed && item.name}
+              <span className="relative flex-shrink-0">
+                <item.icon
+                  className={`h-4 w-4 ${isActive ? "text-white" : "text-slate-500"}`}
+                />
+                {collapsed && item.href === CONTACT_MESSAGES_HREF && unreadMessages > 0 && (
+                  <span className="absolute -right-2.5 -top-2.5 min-w-[18px] rounded-full bg-amber-500 px-1 text-center text-[10px] font-bold leading-[18px] text-white ring-2 ring-white">
+                    {messagesBadge}
+                  </span>
+                )}
+              </span>
+              {!collapsed && <span className="flex-1">{item.name}</span>}
+              {!collapsed && item.href === CONTACT_MESSAGES_HREF && unreadMessages > 0 && (
+                <span
+                  className={`inline-flex min-w-6 items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold ${isActive ? "bg-white text-green-800" : "bg-amber-500 text-white"}`}
+                  title={`${unreadMessages} new messages`}
+                >
+                  {messagesBadge}
+                </span>
+              )}
             </Link>
           );
         })}
