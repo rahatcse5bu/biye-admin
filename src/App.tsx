@@ -13,6 +13,7 @@ import PointsPackages from "./pages/PointsPackages";
 import DefaultQuestions from "./pages/DefaultQuestions";
 import Login from "./pages/Login";
 import ContactMessages from "./pages/ContactMessages";
+import BiodataChanges from "./pages/BiodataChanges";
 import { useAuthStore } from "./store/authStore";
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
         <Route path="/default-questions" element={<DefaultQuestions />} />
         <Route path="/content-management" element={<TemplateManagement />} />
         <Route path="/contact-messages" element={<ContactMessages />} />
+        <Route path="/biodata-changes" element={<BiodataChanges />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/system-settings" element={<Settings />} />
         <Route path="*" element={<Navigate to="/" replace />} />

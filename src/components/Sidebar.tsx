@@ -15,6 +15,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { dashboardService } from "../services/dashboardService";
 import { contactMessageService } from "../services/contactMessageService";
+import { biodataRevisionService } from "../services/biodataRevisionService";
 
 type NavChild = {
   name: string;
@@ -31,6 +32,7 @@ type NavItem = {
 
 const PENDING_BIODATAS_HREF = "/biodatas?status=pending";
 const CONTACT_MESSAGES_HREF = "/contact-messages";
+const BIODATA_CHANGES_HREF = "/biodata-changes";
 
 const navigation: NavItem[] = [
   { name: "Dashboard", href: "/", icon: ChartBarIcon },
@@ -68,6 +70,11 @@ const navigation: NavItem[] = [
         name: "Pending Biodatas",
         href: PENDING_BIODATAS_HREF,
         description: "Awaiting approval",
+      },
+      {
+        name: "Change Requests",
+        href: BIODATA_CHANGES_HREF,
+        description: "Edits awaiting approval",
       },
       {
         name: "Verified Biodatas",
@@ -190,6 +197,16 @@ const Sidebar: React.FC<{
     refetchInterval: 60_000,
     refetchOnWindowFocus: true,
   });
+  // TODO: key sits under "biodata-revisions" so approving or rejecting on that page refreshes it.
+  const { data: pendingChanges = 0 } = useQuery({
+    queryKey: ["biodata-revisions", "pending-count"],
+    queryFn: biodataRevisionService.pendingCount,
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
+  });
+  const biodataGroupTotal = pendingBiodatas + pendingChanges;
+  const groupBadgeText = biodataGroupTotal > 99 ? "99+" : String(biodataGroupTotal);
+  const changesBadgeText = pendingChanges > 99 ? "99+" : String(pendingChanges);
   const badgeText = pendingBiodatas > 99 ? "99+" : String(pendingBiodatas);
   // TODO: key sits under "contact-messages" so actions on the Messages page refresh the badge.
   const { data: unreadMessages = 0 } = useQuery({
@@ -280,12 +297,12 @@ const Sidebar: React.FC<{
                   <div className="flex min-w-0 items-center gap-3">
                     <span className="relative flex-shrink-0">
                       <item.icon className="h-4 w-4 text-slate-500" />
-                      {collapsed && item.name === "Biodatas" && pendingBiodatas > 0 && (
+                      {collapsed && item.name === "Biodatas" && biodataGroupTotal > 0 && (
                         <span
                           className="absolute -right-2.5 -top-2.5 min-w-[18px] rounded-full bg-amber-500 px-1 text-center text-[10px] font-bold leading-[18px] text-white ring-2 ring-white"
-                          title={`${pendingBiodatas} pending biodatas`}
+                          title={`${pendingBiodatas} pending biodatas, ${pendingChanges} change requests`}
                         >
-                          {badgeText}
+                          {groupBadgeText}
                         </span>
                       )}
                     </span>
@@ -297,12 +314,12 @@ const Sidebar: React.FC<{
                   </div>
                   {!collapsed && (
                     <span className="flex items-center gap-2">
-                      {item.name === "Biodatas" && !isExpanded && pendingBiodatas > 0 && (
+                      {item.name === "Biodatas" && !isExpanded && biodataGroupTotal > 0 && (
                         <span
                           className="inline-flex min-w-6 items-center justify-center rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-white"
-                          title={`${pendingBiodatas} pending biodatas`}
+                          title={`${pendingBiodatas} pending biodatas, ${pendingChanges} change requests`}
                         >
-                          {badgeText}
+                          {groupBadgeText}
                         </span>
                       )}
                       <ChevronDownIcon
@@ -334,6 +351,11 @@ const Sidebar: React.FC<{
                             {child.href === PENDING_BIODATAS_HREF && pendingBiodatas > 0 && (
                               <span className={`inline-flex min-w-6 items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold ${childActive ? "bg-white text-green-800" : "bg-amber-500 text-white"}`}>
                                 {badgeText}
+                              </span>
+                            )}
+                            {child.href === BIODATA_CHANGES_HREF && pendingChanges > 0 && (
+                              <span className={`inline-flex min-w-6 items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold ${childActive ? "bg-white text-green-800" : "bg-amber-500 text-white"}`}>
+                                {changesBadgeText}
                               </span>
                             )}
                           </span>
