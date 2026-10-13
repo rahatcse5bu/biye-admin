@@ -543,7 +543,23 @@ const BiodataDetailModal: React.FC<{ userId: number; onClose: () => void }> = ({
               </svg>
             }
           >
-            <KV label="Details" value={JSON.stringify(marital, null, 2)} pre />
+            <dl className="col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 [&_dd]:whitespace-pre-wrap [&_dd]:break-words [&>div]:min-w-0">
+              <KV label="Family agrees to marriage" value={marital.isFamilyAgree?.trim()} />
+              <KV label="Can support wife's purdah" value={marital.isPordaToWife?.trim()} />
+              <KV label="Wife can continue studying" value={marital.permission_for_study?.trim()} />
+              <KV label="Wife can work after marriage" value={marital.permission_for_job?.trim()} />
+              <KV label="Expectations of gifts or dowry" value={marital.isJoutuk?.trim()} />
+              <KV label="Living arrangements after marriage" value={marital.after_marriage_where?.trim()} />
+              <KV label="Reason for divorce" value={marital.divorced_reason?.trim()} />
+              <KV label="Reason for marriage" value={marital.why_marriage?.trim()} />
+              <KV label="Late wife's details" value={marital.wife_dead_info?.trim()} />
+              <KV label="When husband passed away" value={marital.when_husband_dead?.trim()} />
+              <KV label="Reason for another marriage" value={marital.why_married_another?.trim()} />
+              <KV label="Wants to continue working after marriage" value={marital.is_running_job?.trim()} />
+              <KV label="Wants to continue studying after marriage" value={marital.is_running_study?.trim()} />
+              <KV label="Willing to work after marriage" value={marital.after_marriage_running_job?.trim()} />
+              <KV label="Wife and children details" value={marital.quantity_wife_and_children?.trim()} />
+            </dl>
           </Section>
         )}
 
