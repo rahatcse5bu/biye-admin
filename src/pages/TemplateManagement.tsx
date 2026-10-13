@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { svgToImgSrc } from '../utils/svgPreview';
-import { FiPlus, FiEdit2, FiTrash2, FiEye } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiEye, FiPower } from 'react-icons/fi';
+import { toast } from 'react-toastify';
 import { useConfirm } from '../components/ConfirmDialog';
 
 interface Template {
@@ -41,7 +42,7 @@ const TemplateManagement: React.FC = () => {
             setTemplates(res.data.data);
         } catch (error) {
             console.error('Error fetching templates:', error);
-            alert('Failed to load templates');
+            toast.error('Failed to load templates');
         } finally {
             setLoading(false);
         }
@@ -67,7 +68,7 @@ const TemplateManagement: React.FC = () => {
 
     const handleSaveTemplate = async () => {
         if (!editName.trim() || !editSvgCode.trim()) {
-            alert('Template name and SVG code are required');
+            toast.error('Template name and SVG code are required');
             return;
         }
 
@@ -83,18 +84,18 @@ const TemplateManagement: React.FC = () => {
             if (selectedTemplate?._id) {
                 // Update existing
                 await api.put(`/api/v1/photocard-templates/${selectedTemplate._id}`, payload);
-                alert('Template updated successfully');
+                toast.success('Template updated');
             } else {
                 // Create new
                 await api.post('/api/v1/photocard-templates', payload);
-                alert('Template created successfully');
+                toast.success('Template created');
             }
 
             setShowEditor(false);
             fetchTemplates();
         } catch (error: any) {
             console.error('Error saving template:', error);
-            alert(error.response?.data?.message || 'Failed to save template');
+            toast.error(error.response?.status === 413 ? 'Template is too large (max 2 MB). Compress embedded images.' : error.response?.data?.message || 'Failed to save template');
         }
     };
 
@@ -108,11 +109,22 @@ const TemplateManagement: React.FC = () => {
 
         try {
             await api.delete(`/api/v1/photocard-templates/${templateId}`);
-            alert('Template deleted');
+            toast.success('Template deleted');
             fetchTemplates();
         } catch (error) {
             console.error('Error deleting template:', error);
-            alert('Failed to delete template');
+            toast.error((error as any)?.response?.data?.message || 'Failed to delete template');
+        }
+    };
+
+    // TODO: only isActive is sent; the API now updates just the fields it receives.
+    const handleToggleActive = async (template: Template) => {
+        try {
+            await api.put(`/api/v1/photocard-templates/${template._id}`, { isActive: !template.isActive });
+            toast.success(template.isActive ? 'Template disabled' : 'Template enabled');
+            fetchTemplates();
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || 'Failed to update template');
         }
     };
 
@@ -131,6 +143,10 @@ const TemplateManagement: React.FC = () => {
 
                 {loading ? (
                     <div className="text-center py-10">Loading templates...</div>
+                ) : templates.length === 0 ? (
+                    <div className="rounded-lg border border-dashed p-10 text-center text-gray-500">
+                        No templates yet. Create one with “New Template”.
+                    </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {templates.map((template) => (
@@ -178,15 +194,25 @@ const TemplateManagement: React.FC = () => {
                                     </button>
                                     <button
                                         onClick={() => handleEditTemplate(template)}
-                                        className="flex items-center gap-1 flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-sm"
+                                        className="flex items-center gap-1 flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-sm disabled:cursor-not-allowed disabled:opacity-40"
                                         disabled={template.isBuiltIn}
+                                        title={template.isBuiltIn ? 'Built-in templates can’t be edited' : undefined}
                                     >
                                         <FiEdit2 size={16} /> Edit
                                     </button>
                                     <button
+                                        onClick={() => handleToggleActive(template)}
+                                        className={`flex items-center gap-1 px-3 py-2 rounded text-sm ${template.isActive ? 'bg-gray-200 hover:bg-gray-300 text-gray-800' : 'bg-green-600 hover:bg-green-700 text-white'}`}
+                                        title={template.isActive ? 'Disable — members won’t get this design' : 'Enable this template'}
+                                    >
+                                        <FiPower size={16} /> {template.isActive ? 'Disable' : 'Enable'}
+                                    </button>
+                                    <button
                                         onClick={() => handleDeleteTemplate(template._id)}
-                                        className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm"
+                                        className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm disabled:cursor-not-allowed disabled:opacity-40"
                                         disabled={template.isBuiltIn}
+                                        title={template.isBuiltIn ? 'Built-in templates can’t be deleted' : 'Delete'}
+                                        aria-label="Delete template"
                                     >
                                         <FiTrash2 size={16} />
                                     </button>

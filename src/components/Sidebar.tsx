@@ -140,9 +140,10 @@ const navigation: NavItem[] = [
     name: "Engagement",
     icon: BellIcon,
     children: [
-      { name: "Favorites", href: "/biodatas", description: "Saved profiles" },
-      { name: "Shortlists", href: "/biodatas", description: "Match queue" },
-      { name: "Reactions", href: "/biodatas", description: "Interest signals" },
+      { name: "Favorites", href: "/engagement/favorites", description: "Saved profiles" },
+      { name: "Shortlists", href: "/engagement/shortlists", description: "Match queue" },
+      { name: "Reactions", href: "/engagement/reactions", description: "Interest signals" },
+      { name: "Dislikes", href: "/engagement/dislikes", description: "Ignored profiles" },
     ],
   },
   {
@@ -164,7 +165,7 @@ const navigation: NavItem[] = [
         href: "/content-management",
         description: "Forms and assets",
       },
-      { name: "Uploads", href: "/templates", description: "Media library" },
+      { name: "Uploads", href: "/uploads", description: "Member photo library" },
     ],
   },
   { name: "Messages", href: CONTACT_MESSAGES_HREF, icon: ChatBubbleLeftRightIcon },

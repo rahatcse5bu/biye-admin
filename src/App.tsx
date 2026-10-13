@@ -14,6 +14,8 @@ import DefaultQuestions from "./pages/DefaultQuestions";
 import Login from "./pages/Login";
 import ContactMessages from "./pages/ContactMessages";
 import BiodataChanges from "./pages/BiodataChanges";
+import Engagement from "./pages/Engagement";
+import Uploads from "./pages/Uploads";
 import { useAuthStore } from "./store/authStore";
 
 function App() {
@@ -46,6 +48,9 @@ function App() {
         <Route path="/content-management" element={<TemplateManagement />} />
         <Route path="/contact-messages" element={<ContactMessages />} />
         <Route path="/biodata-changes" element={<BiodataChanges />} />
+        <Route path="/engagement" element={<Navigate to="/engagement/favorites" replace />} />
+        <Route path="/engagement/:type" element={<Engagement />} />
+        <Route path="/uploads" element={<Uploads />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/system-settings" element={<Settings />} />
         <Route path="*" element={<Navigate to="/" replace />} />
