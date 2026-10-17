@@ -13,6 +13,7 @@ import Notifications from "./Notifications";
 
 const PAGE_TITLES: Record<string, { title: string; description: string }> = {
   "/": { title: "Dashboard", description: "Platform overview & analytics" },
+  "/accounts": { title: "Accounts", description: "Business expenses, income, and investments" },
   "/biodatas": {
     title: "Biodatas",
     description: "Manage and review biodata submissions",

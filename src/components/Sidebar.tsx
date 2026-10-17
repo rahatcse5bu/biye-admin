@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   ChartBarIcon,
+  BanknotesIcon,
   UsersIcon,
   CreditCardIcon,
   CogIcon,
@@ -36,6 +37,7 @@ const BIODATA_CHANGES_HREF = "/biodata-changes";
 
 const navigation: NavItem[] = [
   { name: "Dashboard", href: "/", icon: ChartBarIcon },
+  { name: "Accounts", href: "/accounts", icon: BanknotesIcon },
   {
     name: "Users",
     icon: UsersIcon,

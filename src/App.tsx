@@ -3,6 +3,7 @@ import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Biodatas from "./pages/Biodatas";
 import Payments from "./pages/Payments";
+import Accounts from "./pages/Accounts";
 import Refunds from "./pages/Refunds";
 import Users from "./pages/Users";
 import Settings from "./pages/Settings";
@@ -33,6 +34,7 @@ function App() {
         <Route path="/verified-biodatas" element={<Biodatas />} />
         <Route path="/featured-biodatas" element={<Biodatas />} />
         <Route path="/payments" element={<Payments />} />
+        <Route path="/accounts" element={<Accounts />} />
         <Route path="/transactions" element={<Payments />} />
         <Route path="/refunds" element={<Refunds />} />
         <Route path="/points-packages" element={<PointsPackages />} />
