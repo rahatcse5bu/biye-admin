@@ -43,7 +43,7 @@ export default function Accounts() {
   const edit = (entry: AccountEntry) => {
     setEditingId(entry._id);
     setForm({ type: entry.type, amount: entry.amount.toFixed(2), date: entry.date, category: entry.category, person: entry.person, notes: entry.notes });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById('entry-form-title')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
