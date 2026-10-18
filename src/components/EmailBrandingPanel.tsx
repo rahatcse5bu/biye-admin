@@ -7,7 +7,8 @@ import { EmailSettings, emailSettingsService } from '../services/emailSettingsSe
 const inputClass =
   'w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500'
 
-const PRESETS = ['Facebook', 'YouTube', 'Instagram', 'WhatsApp']
+// TODO: Facebook, LinkedIn and WhatsApp render as round icons in the email footer; others as text.
+const PRESETS = ['Facebook', 'LinkedIn', 'WhatsApp', 'YouTube', 'Instagram']
 
 const errorMessage = (error: any, fallback: string) =>
   error?.response?.data?.message || fallback
@@ -18,29 +19,36 @@ const EmailBrandingPanel: React.FC = () => {
     queryKey: ['email-settings'],
     queryFn: emailSettingsService.get,
   })
+  const { data: templates = [] } = useQuery({
+    queryKey: ['email-templates'],
+    queryFn: emailSettingsService.templates,
+  })
   const [form, setForm] = useState<EmailSettings | null>(null)
+  const [template, setTemplate] = useState('')
   const [previewHtml, setPreviewHtml] = useState('')
+  const [previewSubject, setPreviewSubject] = useState('')
   const [previewError, setPreviewError] = useState('')
   const [logoBroken, setLogoBroken] = useState(false)
 
   useEffect(() => {
-    if (data) setForm(data)
+    if (data) setForm({ ...data, support_phone: data.support_phone ?? '' })
   }, [data])
 
-  // TODO: debounced live preview of a real email built from the unsaved form.
+  // TODO: debounced live preview of the chosen template built from the unsaved form.
   useEffect(() => {
     if (!form) return
     const timer = setTimeout(() => {
       emailSettingsService
-        .preview(form)
-        .then((html) => {
-          setPreviewHtml(html)
+        .preview(form, template || undefined)
+        .then((result) => {
+          setPreviewHtml(result.html)
+          setPreviewSubject(result.subject)
           setPreviewError('')
         })
         .catch((error) => setPreviewError(errorMessage(error, 'Preview failed')))
     }, 500)
     return () => clearTimeout(timer)
-  }, [form])
+  }, [form, template])
 
   const saveMut = useMutation({
     mutationFn: (value: EmailSettings) => emailSettingsService.update(value),
@@ -92,13 +100,12 @@ const EmailBrandingPanel: React.FC = () => {
       >
         <div>
           <h2 className="text-lg font-semibold text-gray-900">📨 Email Branding</h2>
-          <p className="mt-1 text-sm text-gray-500">Logo and footer used in every email sent to users.</p>
+          <p className="mt-1 text-sm text-gray-500">Header logo and footer contacts used in every email sent to users.</p>
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Logo URL</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Custom header logo URL (optional)</label>
           <input
-            required
             type="url"
             className={inputClass}
             value={form.logo_url}
@@ -110,13 +117,15 @@ const EmailBrandingPanel: React.FC = () => {
           />
           <div className="mt-2 flex items-center gap-3">
             <div className="flex h-14 min-w-[8rem] items-center justify-center rounded-lg bg-[#0D7377] px-3">
-              {logoBroken ? (
+              {!form.logo_url ? (
+                <span className="text-xs text-white/80">Default বিয়ে logo</span>
+              ) : logoBroken ? (
                 <span className="text-xs text-white/80">Image not found</span>
               ) : (
                 <img src={form.logo_url} alt="Logo preview" className="h-10 w-auto" onError={() => setLogoBroken(true)} />
               )}
             </div>
-            <p className="text-xs text-gray-500">Shown on the teal email header. A white or light logo works best. Use a public https link (e.g. Cloudinary).</p>
+            <p className="text-xs text-gray-500">Leave empty to use the standard rings + বিয়ে logo. A custom logo shows on the teal header, so a white one works best. Use a public https link (e.g. Cloudinary).</p>
           </div>
         </div>
 
@@ -128,6 +137,18 @@ const EmailBrandingPanel: React.FC = () => {
             className={inputClass}
             value={form.support_email}
             onChange={(e) => setForm({ ...form, support_email: e.target.value })}
+          />
+        </div>
+
+        <div>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Support phone (footer, optional)</label>
+          <input
+            type="tel"
+            maxLength={30}
+            className={inputClass}
+            value={form.support_phone}
+            onChange={(e) => setForm({ ...form, support_phone: e.target.value })}
+            placeholder="+880 1793-278360"
           />
         </div>
 
@@ -212,7 +233,27 @@ const EmailBrandingPanel: React.FC = () => {
       </form>
 
       <div className="flex min-h-[28rem] flex-col">
-        <p className="mb-2 text-sm font-medium text-gray-700">Live preview</p>
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm font-medium text-gray-700">Live preview</p>
+          <select
+            value={template}
+            onChange={(e) => setTemplate(e.target.value)}
+            className="max-w-full rounded-md border border-gray-300 px-2 py-1 text-sm"
+            aria-label="Email template"
+          >
+            {templates.length === 0 && <option value="">Welcome</option>}
+            {templates.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.code} · {item.name} — {item.trigger}
+              </option>
+            ))}
+          </select>
+        </div>
+        {previewSubject && (
+          <p className="mb-2 truncate text-xs text-gray-500">
+            <span className="font-medium text-gray-700">Subject:</span> {previewSubject} | Bibaho
+          </p>
+        )}
         {previewError ? (
           <div className="flex flex-1 items-center justify-center rounded-lg border border-amber-200 bg-amber-50 p-4 text-center text-sm text-amber-800">
             {previewError}

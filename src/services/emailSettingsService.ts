@@ -8,7 +8,16 @@ export interface SocialLink {
 export interface EmailSettings {
   logo_url: string
   support_email: string
+  support_phone: string
   social_links: SocialLink[]
+}
+
+export interface EmailTemplateInfo {
+  id: string
+  code: string
+  name: string
+  trigger: string
+  subject: string
 }
 
 export const emailSettingsService = {
@@ -22,9 +31,14 @@ export const emailSettingsService = {
     return res.data.data
   },
 
-  preview: async (data: EmailSettings): Promise<string> => {
-    const res = await api.post('/api/v1/email-settings/preview', data)
-    return res.data.data.html
+  templates: async (): Promise<EmailTemplateInfo[]> => {
+    const res = await api.get('/api/v1/email-settings/templates')
+    return res.data.data
+  },
+
+  preview: async (data: EmailSettings, template?: string): Promise<{ html: string; subject: string }> => {
+    const res = await api.post('/api/v1/email-settings/preview', { ...data, template })
+    return res.data.data
   },
 }
 
