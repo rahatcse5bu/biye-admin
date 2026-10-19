@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   BellIcon,
@@ -9,6 +9,28 @@ import {
   AdminNotification,
   notificationService,
 } from "../services/notificationService";
+import ImportantAlertModal from "./ImportantAlertModal";
+
+const SNOOZE_KEY = "admin-alerts-snoozed";
+
+const isAlert = (item: AdminNotification) => item.priority === "important" && !item.isRead;
+
+// TODO: "Later" lasts for this browser session only, so unhandled work pops up again after the next login.
+const readSnoozed = (): string[] => {
+  try {
+    return JSON.parse(sessionStorage.getItem(SNOOZE_KEY) || "[]");
+  } catch {
+    return [];
+  }
+};
+
+const snooze = (ids: string[]) => {
+  try {
+    sessionStorage.setItem(SNOOZE_KEY, JSON.stringify([...new Set([...readSnoozed(), ...ids])].slice(-200)));
+  } catch {
+    // storage blocked; the alert just shows again next load
+  }
+};
 
 const formatTime = (value: string) =>
   new Intl.DateTimeFormat(undefined, {
@@ -23,6 +45,8 @@ const Notifications: React.FC = () => {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const seenIds = useRef(new Set<string>());
+  const [alerts, setAlerts] = useState<AdminNotification[]>([]);
+  const alertsSeeded = useRef(false);
 
   const refresh = async () => {
     try {
@@ -33,6 +57,15 @@ const Notifications: React.FC = () => {
       seenIds.current = new Set(nextItems.map((item) => item._id));
       setItems(nextItems);
       setUnreadCount(nextUnreadCount);
+      // TODO: the first load shows work that arrived while offline; later refreshes only drop alerts another admin already handled.
+      if (!alertsSeeded.current) {
+        alertsSeeded.current = true;
+        const snoozed = readSnoozed();
+        setAlerts(nextItems.filter((item) => isAlert(item) && !snoozed.includes(item._id)));
+      } else {
+        const handled = new Set(nextItems.filter((item) => item.isRead).map((item) => item._id));
+        setAlerts((current) => current.filter((item) => !handled.has(item._id)));
+      }
     } catch {
       // Keep the shell usable when notifications are unavailable.
     }
@@ -49,6 +82,9 @@ const Notifications: React.FC = () => {
       seenIds.current.add(next._id);
       setItems((current) => [next, ...current].slice(0, 30));
       setUnreadCount((count) => count + 1);
+      if (isAlert(next)) {
+        setAlerts((current) => [next, ...current.filter((item) => item._id !== next._id)]);
+      }
 
       if (
         document.hidden &&
@@ -100,8 +136,10 @@ const Notifications: React.FC = () => {
   };
 
   const markRead = async (item: AdminNotification) => {
+    setAlerts((current) => current.filter((entry) => entry._id !== item._id));
+    // TODO: a failed mark-read must not stop the admin from reaching the page.
     if (!item.isRead) {
-      await notificationService.markRead(item._id);
+      await notificationService.markRead(item._id).catch(() => undefined);
       setItems((current) =>
         current.map((entry) =>
           entry._id === item._id ? { ...entry, isRead: true } : entry,
@@ -115,12 +153,27 @@ const Notifications: React.FC = () => {
 
   const markAllRead = async () => {
     await notificationService.markAllRead();
+    setAlerts([]);
     setItems((current) => current.map((item) => ({ ...item, isRead: true })));
     setUnreadCount(0);
   };
 
+  // TODO: opening one closes the modal so it never covers the page the admin is working on; the rest stay in the bell.
+  const openAlert = (item: AdminNotification) => {
+    setAlerts([]);
+    void markRead(item);
+  };
+
+  const later = useCallback(() => {
+    setAlerts((current) => {
+      snooze(current.map((item) => item._id));
+      return [];
+    });
+  }, []);
+
   return (
     <div ref={containerRef} className="relative">
+      {alerts.length > 0 && <ImportantAlertModal alerts={alerts} onOpen={openAlert} onLater={later} />}
       <button
         type="button"
         onClick={() => void toggle()}

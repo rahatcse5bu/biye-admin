@@ -6,6 +6,7 @@ export interface AdminNotification {
   title: string;
   message: string;
   type: string;
+  priority?: "normal" | "important";
   link?: string;
   isRead: boolean;
   createdAt: string;

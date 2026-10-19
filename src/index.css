@@ -132,6 +132,7 @@ code {
   outline: none;
 }
 .blog-editor-content > * + * { margin-top: 0.85em; }
+.blog-editor-content > :first-child { margin-top: 0; }
 .blog-editor-content h2 { font-size: 1.5rem; font-weight: 700; color: #111827; margin-top: 1.4em; }
 .blog-editor-content h3 { font-size: 1.25rem; font-weight: 700; color: #111827; margin-top: 1.2em; }
 .blog-editor-content ul { list-style: disc; padding-left: 1.5rem; }

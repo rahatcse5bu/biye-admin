@@ -872,7 +872,7 @@ const Biodatas: React.FC = () => {
           [
             { label: "Total Biodatas", status: "all", icon: <UserGroupIcon className="h-5 w-5" />, accent: "indigo" },
             { label: "Active", status: "active", icon: <CheckBadgeIcon className="h-5 w-5" />, accent: "green" },
-            { label: "Pending Review", status: "pending", icon: <ClockIcon className="h-5 w-5" />, accent: "yellow" },
+            { label: "Waiting for review", status: "pending", icon: <ClockIcon className="h-5 w-5" />, accent: "yellow" },
             { label: "Banned", status: "banned", icon: <NoSymbolIcon className="h-5 w-5" />, accent: "red" },
           ] as const
         ).map((s) => (
@@ -936,7 +936,7 @@ const Biodatas: React.FC = () => {
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
             <option value="banned">Banned</option>
-            <option value="pending">Pending</option>
+            <option value="pending">Waiting for review</option>
             <option value="approved">Verified</option>
           </select>
 
