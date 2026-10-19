@@ -10,13 +10,21 @@ export interface BlogPost {
   content: string
   cover_image: string
   author: string
+  seo_title?: string
+  seo_description?: string
+  tags?: string[]
   status: BlogStatus
   published_at: string | null
   createdAt: string
   updatedAt: string
 }
 
-export type BlogInput = Pick<BlogPost, 'title' | 'slug' | 'excerpt' | 'content' | 'cover_image' | 'author' | 'status'>
+// TODO: tags are edited as comma-separated text; the backend splits them.
+export type BlogInput = Pick<BlogPost, 'title' | 'slug' | 'excerpt' | 'content' | 'cover_image' | 'author' | 'status'> & {
+  seo_title: string
+  seo_description: string
+  tags: string
+}
 
 export const blogService = {
   list: async (): Promise<BlogPost[]> => {

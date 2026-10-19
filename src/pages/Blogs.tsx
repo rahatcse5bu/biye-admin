@@ -23,6 +23,9 @@ const emptyForm: BlogInput = {
   content: '',
   cover_image: '',
   author: '',
+  seo_title: '',
+  seo_description: '',
+  tags: '',
   status: 'draft',
 }
 
@@ -33,6 +36,9 @@ const toForm = (post: BlogPost): BlogInput => ({
   content: post.content,
   cover_image: post.cover_image,
   author: post.author,
+  seo_title: post.seo_title || '',
+  seo_description: post.seo_description || '',
+  tags: (post.tags || []).join(', '),
   status: post.status,
 })
 
@@ -275,13 +281,36 @@ const Blogs: React.FC = () => {
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">Author (optional)</label>
-                <input className={inputClass} value={form.author} onChange={(e) => setField('author', e.target.value)} placeholder="বিয়ে টিম" />
+                <input className={inputClass} value={form.author} onChange={(e) => setField('author', e.target.value)} placeholder="বিবাহ টিম" />
               </div>
             </div>
 
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">Short summary (optional)</label>
               <textarea rows={2} maxLength={300} className={inputClass} value={form.excerpt} onChange={(e) => setField('excerpt', e.target.value)} placeholder="Shown on the blog list and in search results" />
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
+              <p className="text-sm font-semibold text-gray-800">SEO (optional)</p>
+              <div>
+                <div className="mb-1 flex justify-between text-sm">
+                  <label className="font-medium text-gray-700">SEO title</label>
+                  <span className={form.seo_title.length > 60 ? 'text-amber-600' : 'text-gray-400'}>{form.seo_title.length}/60</span>
+                </div>
+                <input maxLength={120} className={inputClass} value={form.seo_title} onChange={(e) => setField('seo_title', e.target.value)} placeholder="Uses the title when empty" />
+              </div>
+              <div>
+                <div className="mb-1 flex justify-between text-sm">
+                  <label className="font-medium text-gray-700">SEO description</label>
+                  <span className={form.seo_description.length > 160 ? 'text-amber-600' : 'text-gray-400'}>{form.seo_description.length}/160</span>
+                </div>
+                <textarea rows={2} maxLength={320} className={inputClass} value={form.seo_description} onChange={(e) => setField('seo_description', e.target.value)} placeholder="Uses the short summary when empty" />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">Tags</label>
+                <input className={inputClass} value={form.tags} onChange={(e) => setField('tags', e.target.value)} placeholder="বিয়ে, পাত্রী, বায়োডাটা" />
+                <p className="mt-1 text-xs text-gray-500">Separate with commas. Used as keywords and shown on the post.</p>
+              </div>
             </div>
 
             <div>

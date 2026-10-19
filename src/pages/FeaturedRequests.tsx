@@ -256,6 +256,11 @@ const FeaturedRequests: React.FC = () => {
                           {item.biodata && !item.biodata.isFeatured && ' (expired)'}
                         </div>
                       )}
+                      {item.status === 'approved' && (
+                        <div className="text-xs text-gray-500">
+                          {item.impressions ?? 0} impressions · {item.clicks ?? 0} clicks
+                        </div>
+                      )}
                       {item.status === 'rejected' && (
                         <div className="mt-1 max-w-[14rem] text-xs text-gray-500">
                           {item.refunded ? 'Refunded. ' : 'Not refunded. '}

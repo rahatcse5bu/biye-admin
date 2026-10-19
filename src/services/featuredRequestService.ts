@@ -19,6 +19,8 @@ export interface FeaturedRequest {
   admin_note?: string
   reviewed_at?: string
   featured_until?: string
+  impressions?: number
+  clicks?: number
   createdAt: string
   biodata?: { _id: string; isFeatured?: boolean; featured_until?: string | null; biodata_status?: string } | null
 }
