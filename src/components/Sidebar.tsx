@@ -8,7 +8,6 @@ import {
   CogIcon,
   DocumentTextIcon,
   ChevronDownIcon,
-  ShieldCheckIcon,
   FolderOpenIcon,
   BellIcon,
   ChatBubbleLeftRightIcon,
@@ -35,142 +34,63 @@ const PENDING_BIODATAS_HREF = "/biodatas?status=pending";
 const CONTACT_MESSAGES_HREF = "/contact-messages";
 const BIODATA_CHANGES_HREF = "/biodata-changes";
 
+// TODO: one link per page; old URLs like /moderation still route, they just aren't listed twice.
 const navigation: NavItem[] = [
   { name: "Dashboard", href: "/", icon: ChartBarIcon },
-  { name: "Accounts", href: "/accounts", icon: BanknotesIcon },
-  {
-    name: "Users",
-    icon: UsersIcon,
-    children: [
-      {
-        name: "All Users",
-        href: "/users",
-        description: "Manage every account",
-      },
-      {
-        name: "Admins",
-        href: "/admins?role=admin",
-        description: "Staff and permissions",
-      },
-      {
-        name: "User Status",
-        href: "/user-status?status=active",
-        description: "Active and pending users",
-      },
-    ],
-  },
   {
     name: "Biodatas",
     icon: DocumentTextIcon,
     children: [
-      {
-        name: "All Biodatas",
-        href: "/biodatas",
-        description: "Profile inventory",
-      },
-      {
-        name: "Pending Biodatas",
-        href: PENDING_BIODATAS_HREF,
-        description: "Awaiting approval",
-      },
-      {
-        name: "Change Requests",
-        href: BIODATA_CHANGES_HREF,
-        description: "Edits awaiting approval",
-      },
-      {
-        name: "Verified Biodatas",
-        href: "/verified-biodatas?status=approved",
-        description: "Approved records",
-      },
-      {
-        name: "Unverified Biodatas",
-        href: "/unverified-biodatas?status=pending",
-        description: "Needs moderation",
-      },
-      {
-        name: "Featured Biodatas",
-        href: "/featured-biodatas?status=approved",
-        description: "Premium profiles",
-      },
-    ],
-  },
-  {
-    name: "Moderation",
-    icon: ShieldCheckIcon,
-    children: [
-      {
-        name: "Moderation Queue",
-        href: "/moderation",
-        description: "Review pending profiles",
-      },
-      {
-        name: "AI Review",
-        href: "/moderation?source=ai",
-        description: "AI generated checks",
-      },
-      {
-        name: "Photo Cards",
-        href: "/templates",
-        description: "Visual content review",
-      },
-    ],
-  },
-  {
-    name: "Payments",
-    icon: CreditCardIcon,
-    children: [
-      {
-        name: "Transactions",
-        href: "/transactions?status=all",
-        description: "All payment records",
-      },
-      {
-        name: "Points Packages",
-        href: "/points-packages",
-        description: "Website pricing plans",
-      },
-      { name: "Refunds", href: "/refunds", description: "Manual reversals" },
-      {
-        name: "Contact Purchases",
-        href: "/contact-purchases",
-        description: "Profile contact sales",
-      },
-    ],
-  },
-  {
-    name: "Engagement",
-    icon: BellIcon,
-    children: [
-      { name: "Favorites", href: "/engagement/favorites", description: "Saved profiles" },
-      { name: "Shortlists", href: "/engagement/shortlists", description: "Match queue" },
-      { name: "Reactions", href: "/engagement/reactions", description: "Interest signals" },
-      { name: "Dislikes", href: "/engagement/dislikes", description: "Ignored profiles" },
-    ],
-  },
-  {
-    name: "Content",
-    icon: FolderOpenIcon,
-    children: [
-      {
-        name: "Templates",
-        href: "/templates",
-        description: "Photocard templates",
-      },
-      {
-        name: "Default Questions",
-        href: "/default-questions",
-        description: "Proposal questions by religion",
-      },
-      {
-        name: "Content Management",
-        href: "/content-management",
-        description: "Forms and assets",
-      },
-      { name: "Uploads", href: "/uploads", description: "Member photo library" },
+      { name: "Waiting for review", href: PENDING_BIODATAS_HREF, description: "New biodatas to approve or reject" },
+      { name: "Edits to approve", href: BIODATA_CHANGES_HREF, description: "Changes to published biodatas" },
+      { name: "All biodatas", href: "/biodatas", description: "Search and manage every biodata" },
+      { name: "Approved", href: "/verified-biodatas?status=approved", description: "Live on the website" },
+      { name: "Featured", href: "/featured-biodatas?status=approved", description: "Shown on the homepage" },
+      { name: "Unverified", href: "/unverified-biodatas?status=pending", description: "Submitted without an account" },
     ],
   },
   { name: "Messages", href: CONTACT_MESSAGES_HREF, icon: ChatBubbleLeftRightIcon },
+  {
+    name: "Members",
+    icon: UsersIcon,
+    children: [
+      { name: "All members", href: "/users", description: "Find, edit or ban an account" },
+      { name: "By status", href: "/user-status?status=active", description: "Active, pending, banned" },
+      { name: "Admins", href: "/admins?role=admin", description: "Who can use this panel" },
+    ],
+  },
+  {
+    name: "Money",
+    icon: CreditCardIcon,
+    children: [
+      { name: "Payments", href: "/transactions?status=all", description: "Every bKash payment" },
+      { name: "Refunds", href: "/refunds", description: "Refund requests and manual refunds" },
+      { name: "Featured requests", href: "/featured-requests", description: "Paid homepage spots to approve" },
+      { name: "Contact purchases", href: "/contact-purchases", description: "Who bought whose contact" },
+      { name: "Point packages", href: "/points-packages", description: "Prices shown on the website" },
+    ],
+  },
+  { name: "Accounts", href: "/accounts", icon: BanknotesIcon },
+  {
+    name: "Activity",
+    icon: BellIcon,
+    children: [
+      { name: "Favorites", href: "/engagement/favorites", description: "Biodatas members saved" },
+      { name: "Shortlists", href: "/engagement/shortlists", description: "Members' shortlists" },
+      { name: "Reactions", href: "/engagement/reactions", description: "Likes on biodatas" },
+      { name: "Dislikes", href: "/engagement/dislikes", description: "Biodatas members hid" },
+    ],
+  },
+  {
+    name: "Website content",
+    icon: FolderOpenIcon,
+    children: [
+      { name: "Blog", href: "/blogs", description: "Write and publish posts" },
+      { name: "Photo card templates", href: "/templates", description: "Designs for shareable photo cards" },
+      { name: "Proposal questions", href: "/default-questions", description: "Default questions by religion" },
+      { name: "Uploads", href: "/uploads", description: "Member photo library" },
+    ],
+  },
   { name: "Settings", href: "/settings", icon: CogIcon },
 ];
 
@@ -219,14 +139,8 @@ const Sidebar: React.FC<{
     refetchOnWindowFocus: true,
   });
   const messagesBadge = unreadMessages > 99 ? "99+" : String(unreadMessages);
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
-    () =>
-      Object.fromEntries(
-        navigation
-          .filter((item) => item.children)
-          .map((item) => [item.name, true]),
-      ),
-  );
+  // TODO: start with only the current page's group open (plus Biodatas, the daily work) so the menu stays short.
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({ Biodatas: true });
 
   useEffect(() => {
     const activeGroup = navigation.find((item) =>
@@ -246,11 +160,11 @@ const Sidebar: React.FC<{
       <div className="flex h-16 items-center border-b border-slate-200 px-3">
         <div className="flex items-center gap-3 overflow-hidden">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-800 text-xs font-bold tracking-[0.12em] text-white">
-            PN
+            বি
           </div>
           {!collapsed && (
             <div className="leading-tight">
-              <p className="text-sm font-semibold text-slate-900">PNC Nikah</p>
+              <p className="text-sm font-semibold text-slate-900">Bibaho</p>
               <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">
                 Admin
               </p>

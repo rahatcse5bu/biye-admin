@@ -147,12 +147,70 @@ const ListCompare: React.FC<{ before: unknown[]; after: unknown[] }> = ({ before
   )
 }
 
+const isPlainObject = (value: unknown): value is Record<string, unknown> =>
+  !!value && typeof value === 'object' && !Array.isArray(value)
+
+// TODO: labels for keys inside list items (achievements, working history); unknown keys show raw.
+const ITEM_KEY_LABELS: Record<string, string> = {
+  title: 'শিরোনাম',
+  year: 'সাল',
+  description: 'বিবরণ',
+  company_name: 'প্রতিষ্ঠান',
+  designation: 'পদবি',
+  start_date: 'শুরু',
+  end_date: 'শেষ',
+  is_current: 'বর্তমানে কর্মরত',
+  job_description: 'কাজের বিবরণ',
+}
+
+const itemTone = {
+  add: { tag: 'নতুন', card: 'border-green-300 bg-green-50/60', badge: 'bg-green-600 text-white' },
+  del: { tag: 'মুছে ফেলা হবে', card: 'border-red-300 bg-red-50/60 opacity-75', badge: 'bg-red-600 text-white' },
+  same: { tag: '', card: 'border-gray-200 bg-white', badge: '' },
+} as const
+
+const ObjectListCompare: React.FC<{ before: Record<string, unknown>[]; after: Record<string, unknown>[] }> = ({ before, after }) => {
+  const key = (item: Record<string, unknown>) => JSON.stringify(item)
+  const b = before.map(key)
+  const a = after.map(key)
+  const items = [
+    ...after.map((item, i) => ({ item, kind: b.includes(a[i]) ? 'same' : 'add' }) as const),
+    ...before.filter((_, i) => !a.includes(b[i])).map((item) => ({ item, kind: 'del' }) as const),
+  ]
+  if (!items.length) return <Empty />
+  return (
+    <div className="grid gap-2 sm:grid-cols-2">
+      {items.map(({ item, kind }, index) => {
+        const tone = itemTone[kind]
+        const entries = Object.entries(item).filter(([, v]) => !isEmpty(v))
+        return (
+          <div key={index} className={`rounded-lg border p-3 text-sm ${tone.card}`}>
+            {tone.tag && <span className={`mb-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${tone.badge}`}>{tone.tag}</span>}
+            <dl className={`space-y-1 ${kind === 'del' ? 'line-through decoration-red-300' : ''}`}>
+              {entries.map(([k, v]) => (
+                <div key={k} className="grid grid-cols-[7rem_1fr] gap-2">
+                  <dt className="text-xs text-gray-500">{ITEM_KEY_LABELS[k] || k}</dt>
+                  <dd className="whitespace-pre-wrap break-words text-gray-900">{scalarText(v)}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 // TODO: picks the comparison that makes the change easiest to judge for this kind of value.
 const FieldCompare: React.FC<{ row: RevisionField }> = ({ row }) => {
   const { before, after } = row
   const asArray = (v: unknown) => (Array.isArray(v) ? v : isEmpty(v) ? [] : [v])
   if ([...asArray(before), ...asArray(after)].some(isImageUrl)) {
     return <PhotoCompare before={asArray(before).filter(isImageUrl)} after={asArray(after).filter(isImageUrl)} />
+  }
+  const all = [...asArray(before), ...asArray(after)]
+  if (all.length && all.every(isPlainObject)) {
+    return <ObjectListCompare before={asArray(before)} after={asArray(after)} />
   }
   if (Array.isArray(before) || Array.isArray(after)) return <ListCompare before={asArray(before)} after={asArray(after)} />
   const b = isEmpty(before) ? '' : scalarText(before)

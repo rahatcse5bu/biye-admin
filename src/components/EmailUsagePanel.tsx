@@ -20,6 +20,14 @@ const statusStyle: Record<EmailUsage['status'], { label: string; badge: string; 
 const formatTime = (value: string | null) =>
   value ? new Date(value).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : '—'
 
+// TODO: SMTP errors are long and cryptic; show the admin what to fix, full text stays in the tooltip.
+const friendlyError = (error?: string) => {
+  if (!error) return 'Unknown error'
+  if (/535|BadCredentials|Username and Password not accepted/i.test(error)) return 'Gmail rejected the login, check the app password'
+  if (/socket close|ECONNRESET|ETIMEDOUT|ECONNREFUSED/i.test(error)) return 'Connection to Gmail dropped'
+  return error.replace(/https?:\/\/\S+/g, '').trim()
+}
+
 const Stat: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
   <div className="rounded-lg bg-slate-50 px-3 py-2.5">
     <p className="text-xs text-slate-500">{label}</p>
@@ -153,101 +161,105 @@ const EmailUsagePanel: React.FC = () => {
         </div>
       </div>
 
-      <div className="mt-5 grid gap-6 lg:grid-cols-[1.2fr_1fr]">
-        <div>
-          <p className="text-3xl font-semibold text-slate-900">
-            {data.remaining.toLocaleString()}
-            <span className="ml-1.5 text-base font-normal text-slate-500">
-              of {data.daily_limit.toLocaleString()} emails left today
-            </span>
+      {data.blocked_until ? (
+        <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+          Gmail rejected an email for exceeding its daily limit. Emails (including password resets) may fail until about{' '}
+          <strong>{formatTime(data.blocked_until)}</strong>.
+        </p>
+      ) : data.remaining === 0 ? (
+        <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+          The daily limit is used up. The next email can go out around <strong>{formatTime(data.next_slot_at)}</strong>.
+        </p>
+      ) : data.status === 'warning' ? (
+        <p className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          Over 80% of today&apos;s limit is used. Avoid bulk emails until the window frees up.
+        </p>
+      ) : null}
+
+      {/* TODO: minmax(0,…) stops long failure text from widening the grid past the card. */}
+      <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+        <div className="min-w-0">
+          <p className="text-xs font-medium text-slate-500">Left in the last 24 hours</p>
+          <p className="mt-1 flex items-baseline gap-1.5 whitespace-nowrap">
+            <span className="text-4xl font-semibold tabular-nums text-slate-900">{data.remaining.toLocaleString()}</span>
+            <span className="text-sm text-slate-500">/ {data.daily_limit.toLocaleString()}</span>
           </p>
           <div
-            className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-slate-100"
+            className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100"
             role="progressbar"
             aria-valuemin={0}
             aria-valuemax={data.daily_limit}
             aria-valuenow={data.sent_last_24h}
             aria-label="Emails sent in the last 24 hours"
           >
-            <div className={`h-full rounded-full ${style.bar}`} style={{ width: `${usedPercent}%` }} />
+            <div className={`h-full rounded-full ${style.bar}`} style={{ width: `${Math.max(usedPercent, data.sent_last_24h ? 1 : 0)}%` }} />
           </div>
           <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
             <span>
-              {data.sent_last_24h.toLocaleString()} sent in the last 24 hours
-              {data.blocked_until ? ' · blocked by Gmail' : ` (${usedPercent}%)`}
+              {data.sent_last_24h.toLocaleString()} sent{data.blocked_until ? ' · blocked by Gmail' : ` · ${usedPercent}% used`}
             </span>
             <DailyLimitEditor limit={data.daily_limit} />
           </div>
 
-          {data.blocked_until ? (
-            <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
-              Gmail rejected an email for exceeding its daily limit. Emails (including password resets) may fail until about{' '}
-              <strong>{formatTime(data.blocked_until)}</strong>.
-            </p>
-          ) : data.remaining === 0 ? (
-            <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
-              The daily limit is used up. The next email can go out around <strong>{formatTime(data.next_slot_at)}</strong>.
-            </p>
-          ) : data.status === 'warning' ? (
-            <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
-              Over 80% of today&apos;s limit is used. Avoid bulk emails until the window frees up.
-            </p>
-          ) : null}
-
-          <div className="mt-4 grid grid-cols-3 gap-2">
+          <div className="mt-5 grid grid-cols-3 gap-2">
             <Stat label="Total sent" value={data.total_sent.toLocaleString()} />
-            <Stat label="Total failed" value={data.total_failed.toLocaleString()} />
+            <Stat label="Total failed" value={<span className={data.total_failed ? 'text-red-600' : ''}>{data.total_failed.toLocaleString()}</span>} />
             <Stat
-              label="Counting since"
-              value={<span className="text-sm">{data.counting_since ? new Date(data.counting_since).toLocaleDateString() : '—'}</span>}
+              label="Since"
+              value={<span className="text-sm">{data.counting_since ? new Date(data.counting_since).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : '—'}</span>}
             />
           </div>
         </div>
 
-        <div>
-          <p className="text-xs font-medium text-slate-500">Last 7 days</p>
+        <div className="min-w-0">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-medium text-slate-500">Last 7 days</p>
+            <div className="flex items-center gap-3 text-xs text-slate-500">
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-green-700" />Sent</span>
+              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-red-500" />Failed</span>
+            </div>
+          </div>
           {data.daily.length ? (
-            <ResponsiveContainer width="100%" height={140}>
-              <BarChart data={data.daily} barGap={2}>
+            <ResponsiveContainer width="100%" height={150}>
+              <BarChart data={data.daily} margin={{ top: 8, right: 0, left: 0, bottom: 0 }}>
                 <XAxis
                   dataKey="date"
                   axisLine={false}
                   tickLine={false}
                   tick={{ fontSize: 11, fill: '#94a3b8' }}
-                  tickFormatter={(date: string) => date.slice(5)}
+                  tickFormatter={(date: string) => new Date(date).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
                 />
                 <Tooltip
                   cursor={{ fill: '#f8fafc' }}
-                  contentStyle={{ borderRadius: 10, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}
+                  contentStyle={{ borderRadius: 10, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.08)', fontSize: 12 }}
                 />
-                <Bar dataKey="sent" name="Sent" stackId="a" fill="#15803d" isAnimationActive={false} />
-                <Bar dataKey="failed" name="Failed" stackId="a" fill="#ef4444" radius={[4, 4, 0, 0]} isAnimationActive={false} />
+                <Bar dataKey="sent" name="Sent" stackId="a" fill="#15803d" maxBarSize={36} isAnimationActive={false} />
+                <Bar dataKey="failed" name="Failed" stackId="a" fill="#ef4444" maxBarSize={36} radius={[4, 4, 0, 0]} isAnimationActive={false} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
             <p className="mt-2 text-sm text-slate-400">No emails sent in the last 7 days.</p>
           )}
-
-          {data.recent_failures.length > 0 && (
-            <div className="mt-3">
-              <p className="text-xs font-medium text-slate-500">Recent failures</p>
-              <ul className="mt-1 divide-y divide-slate-100 text-xs">
-                {data.recent_failures.map((failure) => (
-                  <li key={failure._id} className="py-1.5">
-                    <div className="flex justify-between gap-2">
-                      <span className="truncate font-medium text-slate-700">{failure.to}</span>
-                      <span className="shrink-0 text-slate-400">{formatTime(failure.createdAt)}</span>
-                    </div>
-                    <p className="truncate text-slate-500" title={failure.error}>
-                      {failure.limit_hit ? 'Daily limit exceeded' : failure.error || 'Unknown error'}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
       </div>
+
+      {data.recent_failures.length > 0 && (
+        <div className="mt-5">
+          <p className="text-xs font-medium text-slate-500">Recent failures</p>
+          <ul className="mt-2 divide-y divide-slate-100 rounded-lg border border-slate-100">
+            {data.recent_failures.map((failure) => (
+              <li key={failure._id} className="flex items-center gap-3 px-3 py-2 text-xs">
+                <XCircleIcon className="h-4 w-4 shrink-0 text-red-400" aria-hidden="true" />
+                <span className="w-44 shrink-0 truncate font-medium text-slate-700" title={failure.to}>{failure.to}</span>
+                <span className="min-w-0 flex-1 truncate text-slate-500" title={failure.error}>
+                  {failure.limit_hit ? 'Daily limit exceeded' : friendlyError(failure.error)}
+                </span>
+                <span className="shrink-0 tabular-nums text-slate-400">{formatTime(failure.createdAt)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <p className="mt-4 border-t border-slate-100 pt-3 text-xs text-slate-400">
         Counts emails sent by the website. Emails sent by hand from the same Gmail account also use Gmail&apos;s limit but

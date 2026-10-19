@@ -121,3 +121,30 @@ code {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* TODO: mirrors the website's .blog-content styles so the editor shows posts as they will look. */
+.blog-editor-content {
+  min-height: 320px;
+  padding: 1rem 1.25rem;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: #374151;
+  outline: none;
+}
+.blog-editor-content > * + * { margin-top: 0.85em; }
+.blog-editor-content h2 { font-size: 1.5rem; font-weight: 700; color: #111827; margin-top: 1.4em; }
+.blog-editor-content h3 { font-size: 1.25rem; font-weight: 700; color: #111827; margin-top: 1.2em; }
+.blog-editor-content ul { list-style: disc; padding-left: 1.5rem; }
+.blog-editor-content ol { list-style: decimal; padding-left: 1.5rem; }
+.blog-editor-content blockquote { border-left: 4px solid #0d7377; padding-left: 1rem; color: #4b5563; font-style: italic; }
+.blog-editor-content a { color: #0d7377; text-decoration: underline; }
+.blog-editor-content img { max-width: 100%; height: auto; border-radius: 0.75rem; }
+.blog-editor-content img.ProseMirror-selectednode { outline: 3px solid #3b82f6; }
+.blog-editor-content hr { border-color: #e5e7eb; margin: 1.5em 0; }
+.blog-editor-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: #9ca3af;
+  pointer-events: none;
+}

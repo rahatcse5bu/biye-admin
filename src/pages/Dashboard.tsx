@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   UsersIcon,
   DocumentTextIcon,
   CreditCardIcon,
   ArrowPathIcon,
   ClockIcon,
+  ChevronRightIcon,
 } from "@heroicons/react/24/outline";
 import {
   BarChart,
@@ -22,6 +23,7 @@ import {
 } from "recharts";
 import { dashboardService, DashboardStats } from "../services/dashboardService";
 import EmailUsagePanel from "../components/EmailUsagePanel";
+import AttentionPanel from "../components/AttentionPanel";
 
 interface StatCard {
   name: string;
@@ -68,16 +70,31 @@ const BreakdownRow: React.FC<{
   label: string;
   value: string | number;
   dot: string;
-}> = ({ label, value, dot }) => (
-  <div className="flex justify-between items-center py-1.5">
+  to: string;
+}> = ({ label, value, dot, to }) => (
+  <Link
+    to={to}
+    className="group -mx-2 flex items-center justify-between rounded-md px-2 py-1.5 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-700"
+  >
     <div className="flex items-center gap-2">
       <span className={`w-2 h-2 rounded-full ${dot}`} />
-      <span className="text-sm text-gray-600">{label}</span>
+      <span className="text-sm text-gray-600 group-hover:text-gray-900">{label}</span>
     </div>
-    <span className="text-sm font-semibold text-gray-900">
+    <span className="flex items-center gap-1 text-sm font-semibold text-gray-900">
       {typeof value === "number" ? value.toLocaleString() : value}
+      <ChevronRightIcon className="h-3.5 w-3.5 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-slate-500" />
     </span>
-  </div>
+  </Link>
+);
+
+const ViewAllLink: React.FC<{ to: string }> = ({ to }) => (
+  <Link
+    to={to}
+    className="ml-auto inline-flex items-center gap-0.5 rounded text-xs font-medium text-green-800 hover:text-green-900 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-green-700"
+  >
+    View all
+    <ChevronRightIcon className="h-3.5 w-3.5" />
+  </Link>
 );
 
 const RADIAN = Math.PI / 180;
@@ -109,6 +126,7 @@ const renderCustomLabel = ({
 };
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [bioStats, setBioStats] = useState<Record<string, number> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -205,10 +223,10 @@ const Dashboard: React.FC = () => {
 
   const pieData = stats
     ? [
-        { name: "Active", value: stats.users.active, color: "#10B981" },
-        { name: "Inactive", value: stats.users.inactive, color: "#F59E0B" },
-        { name: "Banned", value: stats.users.banned, color: "#EF4444" },
-        { name: "Pending", value: stats.users.pending, color: "#15803d" },
+        { name: "Active", status: "active", value: stats.users.active, color: "#10B981" },
+        { name: "Inactive", status: "inactive", value: stats.users.inactive, color: "#F59E0B" },
+        { name: "Banned", status: "banned", value: stats.users.banned, color: "#EF4444" },
+        { name: "Pending", status: "pending", value: stats.users.pending, color: "#15803d" },
       ].filter((d) => d.value > 0)
     : [];
 
@@ -227,6 +245,7 @@ const Dashboard: React.FC = () => {
           Platform activity at a glance.
         </p>
       </div>
+      <AttentionPanel />
       {cards.length === 0 && (
         <div
           role="status"
@@ -251,9 +270,12 @@ const Dashboard: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {pieData.length > 0 && (
             <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-              <h3 className="text-base font-semibold text-slate-900">
-                User Status
-              </h3>
+              <div className="flex items-center">
+                <h3 className="text-base font-semibold text-slate-900">
+                  User Status
+                </h3>
+                <ViewAllLink to="/users" />
+              </div>
               <p className="mt-1 text-xs text-slate-500">
                 Distribution across all accounts
               </p>
@@ -268,6 +290,10 @@ const Dashboard: React.FC = () => {
                     dataKey="value"
                     labelLine={false}
                     label={renderCustomLabel}
+                    className="cursor-pointer"
+                    onClick={(d: { status?: string }) =>
+                      d.status && navigate(`/users?status=${d.status}`)
+                    }
                   >
                     {pieData.map((e, i) => (
                       <Cell key={i} fill={e.color} />
@@ -294,9 +320,12 @@ const Dashboard: React.FC = () => {
 
           {bioBarData.length > 0 && (
             <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-              <h3 className="text-base font-semibold text-slate-900">
-                Biodata Gender Split
-              </h3>
+              <div className="flex items-center">
+                <h3 className="text-base font-semibold text-slate-900">
+                  Biodata Gender Split
+                </h3>
+                <ViewAllLink to="/biodatas" />
+              </div>
               <p className="mt-1 text-xs text-slate-500">
                 Male vs. female submissions
               </p>
@@ -322,7 +351,12 @@ const Dashboard: React.FC = () => {
                       boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
                     }}
                   />
-                  <Bar dataKey="count" radius={[8, 8, 0, 0]}>
+                  <Bar
+                    dataKey="count"
+                    radius={[8, 8, 0, 0]}
+                    className="cursor-pointer"
+                    onClick={() => navigate("/biodatas")}
+                  >
                     <Cell fill="#15803d" />
                     <Cell fill="#94b8b2" />
                   </Bar>
@@ -342,32 +376,38 @@ const Dashboard: React.FC = () => {
               <h3 className="text-sm font-semibold text-slate-900">
                 Users Breakdown
               </h3>
+              <ViewAllLink to="/users" />
             </div>
             <div className="divide-y divide-slate-100">
               <BreakdownRow
                 label="Active"
                 value={stats.users.active}
                 dot="bg-emerald-400"
+                to="/users?status=active"
               />
               <BreakdownRow
                 label="Inactive"
                 value={stats.users.inactive}
                 dot="bg-gray-300"
+                to="/users?status=inactive"
               />
               <BreakdownRow
                 label="Pending"
                 value={stats.users.pending}
                 dot="bg-amber-400"
+                to="/users?status=pending"
               />
               <BreakdownRow
                 label="Banned"
                 value={stats.users.banned}
                 dot="bg-red-400"
+                to="/users?status=banned"
               />
               <BreakdownRow
                 label="New (30 days)"
                 value={stats.users.recent}
                 dot="bg-indigo-400"
+                to="/users"
               />
             </div>
           </div>
@@ -377,22 +417,26 @@ const Dashboard: React.FC = () => {
                 <DocumentTextIcon className="h-4 w-4" />
               </div>
               <h3 className="text-sm font-semibold text-slate-900">Biodatas</h3>
+              <ViewAllLink to="/biodatas" />
             </div>
             <div className="divide-y divide-slate-100">
               <BreakdownRow
                 label="Total"
                 value={stats.biodatas.total}
                 dot="bg-indigo-400"
+                to="/biodatas"
               />
               <BreakdownRow
                 label="Verified"
                 value={stats.biodatas.verified}
                 dot="bg-emerald-400"
+                to="/verified-biodatas?status=approved"
               />
               <BreakdownRow
                 label="Pending"
                 value={stats.biodatas.pending}
                 dot="bg-amber-400"
+                to="/biodatas?status=pending"
               />
             </div>
           </div>
@@ -402,27 +446,32 @@ const Dashboard: React.FC = () => {
                 <CreditCardIcon className="h-4 w-4" />
               </div>
               <h3 className="text-sm font-semibold text-slate-900">Payments</h3>
+              <ViewAllLink to="/transactions?status=all" />
             </div>
             <div className="divide-y divide-slate-100">
               <BreakdownRow
                 label="Total"
                 value={stats.payments.total}
                 dot="bg-indigo-400"
+                to="/transactions?status=all"
               />
               <BreakdownRow
                 label="Completed"
                 value={stats.payments.completed}
                 dot="bg-emerald-400"
+                to="/transactions?status=Completed"
               />
               <BreakdownRow
                 label="Pending"
                 value={stats.payments.pending}
                 dot="bg-amber-400"
+                to="/transactions?status=Pending"
               />
               <BreakdownRow
                 label="Revenue"
                 value={`৳${stats.payments.revenue.toLocaleString()}`}
                 dot="bg-violet-400"
+                to="/transactions?status=Completed"
               />
             </div>
           </div>

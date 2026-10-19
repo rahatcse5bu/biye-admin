@@ -12,34 +12,32 @@ import { useAuthStore } from "../store/authStore";
 import Notifications from "./Notifications";
 
 const PAGE_TITLES: Record<string, { title: string; description: string }> = {
-  "/": { title: "Dashboard", description: "Platform overview & analytics" },
-  "/accounts": { title: "Accounts", description: "Business expenses, income, and investments" },
-  "/biodatas": {
-    title: "Biodatas",
-    description: "Manage and review biodata submissions",
-  },
-  "/users": { title: "Users", description: "Manage registered user accounts" },
-  "/payments": {
-    title: "Payments",
-    description: "Track transactions and revenue",
-  },
-  "/contact-purchases": {
-    title: "Contact Purchases",
-    description: "View contact purchase history",
-  },
-  "/refunds": { title: "Refunds", description: "Process bKash refunds" },
-  "/unverified-biodatas": {
-    title: "Unverified Biodatas",
-    description: "Review submissions awaiting verification",
-  },
-  "/templates": {
-    title: "Templates",
-    description: "Manage biodata forms and fields",
-  },
-  "/settings": {
-    title: "Settings",
-    description: "API and system configuration",
-  },
+  "/": { title: "Dashboard", description: "What needs attention and how the site is doing" },
+  "/biodatas": { title: "Biodatas", description: "Search, review and manage biodatas" },
+  "/verified-biodatas": { title: "Approved biodatas", description: "Biodatas live on the website" },
+  "/featured-biodatas": { title: "Featured biodatas", description: "Biodatas shown on the homepage" },
+  "/unverified-biodatas": { title: "Unverified biodatas", description: "Submitted without an account" },
+  "/moderation": { title: "Unverified biodatas", description: "Submitted without an account" },
+  "/biodata-changes": { title: "Edits to approve", description: "Changes members made to published biodatas" },
+  "/contact-messages": { title: "Messages", description: "Sent from the website contact form" },
+  "/users": { title: "Members", description: "Find, edit or ban an account" },
+  "/user-status": { title: "Members by status", description: "Active, pending and banned accounts" },
+  "/admins": { title: "Admins", description: "Who can use this panel" },
+  "/payments": { title: "Payments", description: "Every bKash payment" },
+  "/transactions": { title: "Payments", description: "Every bKash payment" },
+  "/refunds": { title: "Refunds", description: "Refund requests and manual bKash refunds" },
+  "/featured-requests": { title: "Featured requests", description: "Paid homepage spots to approve" },
+  "/contact-purchases": { title: "Contact purchases", description: "Who bought whose contact details" },
+  "/contact-requests": { title: "Contact purchases", description: "Who bought whose contact details" },
+  "/points-packages": { title: "Point packages", description: "Prices shown on the website" },
+  "/accounts": { title: "Accounts", description: "Business expenses, income and investments" },
+  "/blogs": { title: "Blog", description: "Write and publish posts" },
+  "/templates": { title: "Photo card templates", description: "Designs for shareable photo cards" },
+  "/content-management": { title: "Photo card templates", description: "Designs for shareable photo cards" },
+  "/default-questions": { title: "Proposal questions", description: "Default questions by religion" },
+  "/uploads": { title: "Uploads", description: "Member photo library" },
+  "/settings": { title: "Settings", description: "Emails and reminders" },
+  "/system-settings": { title: "Settings", description: "Emails and reminders" },
 };
 
 const Header: React.FC<{
@@ -53,8 +51,8 @@ const Header: React.FC<{
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const page = PAGE_TITLES[location.pathname] ?? {
-    title: "Admin Panel",
-    description: "PNC Nikah Administration",
+    title: location.pathname.startsWith("/engagement") ? "Activity" : "Admin Panel",
+    description: location.pathname.startsWith("/engagement") ? "What members save, like and hide" : "Bibaho administration",
   };
 
   useEffect(() => {

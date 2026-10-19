@@ -60,6 +60,7 @@ export interface BiodataDetail {
 export interface BiodataFilters {
   search?: string
   bio_type?: string
+  status?: string
   gender?: string
   marital_status?: string
   page?: number
@@ -73,6 +74,7 @@ export const biodataService = {
     const params = new URLSearchParams()
     if (filters.search) params.append('search', filters.search)
     if (filters.bio_type && filters.bio_type !== 'all') params.append('bio_type', filters.bio_type)
+    if (filters.status && filters.status !== 'all') params.append('status', filters.status)
     if (filters.gender && filters.gender !== 'all') params.append('gender', filters.gender)
     if (filters.marital_status && filters.marital_status !== 'all') params.append('marital_status', filters.marital_status)
     if (filters.page) params.append('page', filters.page.toString())

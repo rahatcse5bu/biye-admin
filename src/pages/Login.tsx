@@ -89,11 +89,11 @@ const Login: React.FC = () => {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/5 rounded-full" />
         <div className="relative flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
-            <span className="text-white font-bold text-base">PN</span>
+            <span className="text-white font-bold text-base">বি</span>
           </div>
           <div>
             <p className="text-white font-semibold text-lg leading-none">
-              PNC Nikah
+              Bibaho
             </p>
             <p className="text-green-200 text-xs mt-0.5">Admin Portal</p>
           </div>
@@ -122,9 +122,9 @@ const Login: React.FC = () => {
         <div className="w-full max-w-sm space-y-8">
           <div className="lg:hidden flex items-center gap-3 mb-4">
             <div className="w-9 h-9 rounded-xl bg-green-700 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">PN</span>
+              <span className="text-white font-bold text-sm">বি</span>
             </div>
-            <p className="text-gray-900 font-semibold">PNC Nikah Admin</p>
+            <p className="text-gray-900 font-semibold">Bibaho Admin</p>
           </div>
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Welcome back</h2>

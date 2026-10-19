@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   MagnifyingGlassIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   ArrowPathIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
@@ -12,6 +10,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { userService, User } from "../services/userService";
 import { toast } from "react-toastify";
 import { useConfirm } from "../components/ConfirmDialog";
+import Pagination from "../components/Pagination";
+import StatCard from "../components/StatCard";
 
 function useDebounce(value: string, delay: number) {
   const [debounced, setDebounced] = useState(value);
@@ -81,6 +81,9 @@ const Users: React.FC = () => {
 
   const users: User[] = res?.data?.users || [];
   const pagination = res?.data?.pagination;
+  const statusCounts: Record<string, number> = res?.data?.statusCounts ?? {
+    all: pagination?.totalItems || users.length,
+  };
 
   const statusMut = useMutation({
     mutationFn: ({ id, status }: { id: string; status: string }) =>
@@ -151,37 +154,26 @@ const Users: React.FC = () => {
 
       {/* Stats row */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        {[
-          {
-            label: "Total",
-            value: pagination?.totalItems || users.length,
-            color: "blue",
-          },
-          {
-            label: "Active",
-            value: users.filter((u) => u.user_status === "active").length,
-            color: "green",
-          },
-          {
-            label: "Pending",
-            value: users.filter((u) => u.user_status === "pending").length,
-            color: "yellow",
-          },
-          {
-            label: "In Review",
-            value: users.filter((u) => u.user_status === "in review").length,
-            color: "indigo",
-          },
-          {
-            label: "Banned",
-            value: users.filter((u) => u.user_status === "banned").length,
-            color: "red",
-          },
-        ].map((s) => (
-          <div key={s.label} className="bg-white rounded-lg shadow p-4">
-            <div className="text-xs text-gray-500">{s.label}</div>
-            <div className="text-2xl font-bold text-gray-900">{s.value}</div>
-          </div>
+        {(
+          [
+            { label: "Total", status: "all", accent: "blue" },
+            { label: "Active", status: "active", accent: "green" },
+            { label: "Pending", status: "pending", accent: "yellow" },
+            { label: "In Review", status: "in review", accent: "indigo" },
+            { label: "Banned", status: "banned", accent: "red" },
+          ] as const
+        ).map((s) => (
+          <StatCard
+            key={s.label}
+            label={s.label}
+            value={statusCounts[s.status] ?? 0}
+            accent={s.accent}
+            selected={statusFilter === s.status}
+            onClick={() => {
+              setStatusFilter(s.status);
+              setPage(1);
+            }}
+          />
         ))}
       </div>
 
@@ -420,28 +412,13 @@ const Users: React.FC = () => {
         </div>
 
         {pagination && (
-          <div className="flex items-center justify-between px-4 py-3 border-t bg-gray-50 text-sm">
-            <span className="text-gray-600">
-              Page {pagination.currentPage} of {pagination.totalPages} ·{" "}
-              {pagination.totalItems} total
-            </span>
-            <div className="flex gap-2">
-              <button
-                disabled={!pagination.hasPrev}
-                onClick={() => setPage((p) => p - 1)}
-                className="px-3 py-1.5 border rounded-md disabled:opacity-40 hover:bg-white"
-              >
-                <ChevronLeftIcon className="h-4 w-4" />
-              </button>
-              <button
-                disabled={!pagination.hasNext}
-                onClick={() => setPage((p) => p + 1)}
-                className="px-3 py-1.5 border rounded-md disabled:opacity-40 hover:bg-white"
-              >
-                <ChevronRightIcon className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
+          <Pagination
+            page={page}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.totalItems}
+            pageSize={limit}
+            onPageChange={setPage}
+          />
         )}
       </div>
     </div>

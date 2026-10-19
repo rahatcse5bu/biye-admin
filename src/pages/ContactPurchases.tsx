@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { MagnifyingGlassIcon, ArrowPathIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
+import { MagnifyingGlassIcon, ArrowPathIcon } from '@heroicons/react/24/outline'
 import { format } from 'date-fns'
 import { useQuery } from '@tanstack/react-query'
 import { contactPurchaseService, ContactPurchase } from '../services/contactPurchaseService'
+import Pagination from '../components/Pagination'
 
 function useDebounce(value: string, delay: number) {
   const [debounced, setDebounced] = useState(value)
@@ -97,13 +98,7 @@ const ContactPurchases: React.FC = () => {
           </table>
         </div>
 
-        <div className="flex items-center justify-between px-4 py-3 border-t bg-gray-50 text-sm">
-          <span className="text-gray-600">Page {page} of {totalPages} · {totalItems} total</span>
-          <div className="flex gap-2">
-            <button disabled={page <= 1} onClick={() => setPage(p => p - 1)} className="px-3 py-1.5 border rounded-md disabled:opacity-40 hover:bg-white"><ChevronLeftIcon className="h-4 w-4" /></button>
-            <button disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className="px-3 py-1.5 border rounded-md disabled:opacity-40 hover:bg-white"><ChevronRightIcon className="h-4 w-4" /></button>
-          </div>
-        </div>
+        <Pagination page={page} totalPages={totalPages} totalItems={totalItems} pageSize={limit} onPageChange={setPage} />
       </div>
     </div>
   )

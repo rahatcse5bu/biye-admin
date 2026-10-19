@@ -10,6 +10,9 @@ export interface EmailSettings {
   support_email: string
   support_phone: string
   social_links: SocialLink[]
+  footer_links: SocialLink[]
+  sender_name: string
+  disabled_templates: string[]
 }
 
 export interface EmailTemplateInfo {
@@ -18,6 +21,7 @@ export interface EmailTemplateInfo {
   name: string
   trigger: string
   subject: string
+  locked: boolean
 }
 
 export const emailSettingsService = {
@@ -39,6 +43,11 @@ export const emailSettingsService = {
   preview: async (data: EmailSettings, template?: string): Promise<{ html: string; subject: string }> => {
     const res = await api.post('/api/v1/email-settings/preview', { ...data, template })
     return res.data.data
+  },
+
+  sendTest: async (data: EmailSettings, to: string, template?: string): Promise<string> => {
+    const res = await api.post('/api/v1/email-settings/test', { ...data, to, template })
+    return res.data.message
   },
 }
 

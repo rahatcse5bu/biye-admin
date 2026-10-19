@@ -5,6 +5,7 @@ import Biodatas from "./pages/Biodatas";
 import Payments from "./pages/Payments";
 import Accounts from "./pages/Accounts";
 import Refunds from "./pages/Refunds";
+import FeaturedRequests from "./pages/FeaturedRequests";
 import Users from "./pages/Users";
 import Settings from "./pages/Settings";
 import ContactPurchases from "./pages/ContactPurchases";
@@ -17,6 +18,7 @@ import ContactMessages from "./pages/ContactMessages";
 import BiodataChanges from "./pages/BiodataChanges";
 import Engagement from "./pages/Engagement";
 import Uploads from "./pages/Uploads";
+import Blogs from "./pages/Blogs";
 import { useAuthStore } from "./store/authStore";
 
 function App() {
@@ -37,6 +39,7 @@ function App() {
         <Route path="/accounts" element={<Accounts />} />
         <Route path="/transactions" element={<Payments />} />
         <Route path="/refunds" element={<Refunds />} />
+        <Route path="/featured-requests" element={<FeaturedRequests />} />
         <Route path="/points-packages" element={<PointsPackages />} />
         <Route path="/users" element={<Users />} />
         <Route path="/admins" element={<Users />} />
@@ -53,6 +56,7 @@ function App() {
         <Route path="/engagement" element={<Navigate to="/engagement/favorites" replace />} />
         <Route path="/engagement/:type" element={<Engagement />} />
         <Route path="/uploads" element={<Uploads />} />
+        <Route path="/blogs" element={<Blogs />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/system-settings" element={<Settings />} />
         <Route path="*" element={<Navigate to="/" replace />} />

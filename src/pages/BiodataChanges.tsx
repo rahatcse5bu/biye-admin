@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { ArrowPathIcon, ChevronLeftIcon, ChevronRightIcon, ClipboardDocumentCheckIcon } from '@heroicons/react/24/outline'
+import { ArrowPathIcon, ClipboardDocumentCheckIcon } from '@heroicons/react/24/outline'
 import { useQuery } from '@tanstack/react-query'
 import { biodataRevisionService, RevisionStatus, RevisionSummary } from '../services/biodataRevisionService'
 import RevisionReview, { formatDate, statusStyle } from '../components/RevisionReview'
+import Pagination from '../components/Pagination'
 
 const tabs: { label: string; value: RevisionStatus }[] = [
   { label: 'Pending', value: 'pending' },
@@ -117,19 +118,7 @@ const BiodataChanges: React.FC = () => {
               ))}
             </tbody>
           </table>
-          <div className="flex items-center justify-between border-t bg-gray-50 px-4 py-3 text-sm">
-            <span className="text-gray-600">
-              Page {page} of {totalPages} · {res?.total ?? 0} total
-            </span>
-            <div className="flex gap-2">
-              <button type="button" aria-label="Previous page" disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className="rounded-md border px-3 py-1.5 hover:bg-white disabled:opacity-40">
-                <ChevronLeftIcon className="h-4 w-4" />
-              </button>
-              <button type="button" aria-label="Next page" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)} className="rounded-md border px-3 py-1.5 hover:bg-white disabled:opacity-40">
-                <ChevronRightIcon className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
+          <Pagination page={page} totalPages={totalPages} totalItems={res?.total ?? 0} pageSize={limit} onPageChange={setPage} />
         </div>
       )}
 

@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react'
 import {
   ArrowPathIcon,
   CheckCircleIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   EnvelopeIcon,
   EnvelopeOpenIcon,
   InboxIcon,
@@ -16,6 +14,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { useConfirm } from '../components/ConfirmDialog'
 import { contactMessageService, ContactMessage, ContactMessageStatus } from '../services/contactMessageService'
+import Pagination from '../components/Pagination'
 
 const SITE_URL = 'https://www.bibaho.org'
 
@@ -253,31 +252,14 @@ const ContactMessages: React.FC = () => {
       )}
 
       {items.length > 0 && (
-        <div className="flex items-center justify-between rounded-lg bg-white px-4 py-3 text-sm shadow">
-          <span className="text-gray-600">
-            Page {page} of {totalPages} · {total} total
-          </span>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              aria-label="Previous page"
-              disabled={page <= 1}
-              onClick={() => setPage((p) => p - 1)}
-              className="rounded-md border px-3 py-1.5 hover:bg-gray-50 disabled:opacity-40"
-            >
-              <ChevronLeftIcon className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              aria-label="Next page"
-              disabled={page >= totalPages}
-              onClick={() => setPage((p) => p + 1)}
-              className="rounded-md border px-3 py-1.5 hover:bg-gray-50 disabled:opacity-40"
-            >
-              <ChevronRightIcon className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          totalItems={total}
+          pageSize={limit}
+          onPageChange={setPage}
+          className="rounded-lg bg-white shadow"
+        />
       )}
     </div>
   )

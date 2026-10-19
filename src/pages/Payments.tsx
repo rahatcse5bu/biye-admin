@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   MagnifyingGlassIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   EyeIcon,
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
@@ -13,6 +11,8 @@ import { paymentService, Payment } from "../services/paymentService";
 import { toast } from "react-toastify";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useConfirm } from "../components/ConfirmDialog";
+import Pagination from "../components/Pagination";
+import StatCard from "../components/StatCard";
 
 const Payments: React.FC = () => {
   const queryClient = useQueryClient();
@@ -98,10 +98,15 @@ const Payments: React.FC = () => {
     return m[s] || "bg-gray-100 text-gray-700";
   };
 
-  const totalRevenue = payments.reduce(
-    (sum, p) => (p.status === "Completed" ? sum + (p.amount || 0) : sum),
-    0,
-  );
+  const statusCounts: Record<string, number> = res?.data?.statusCounts ?? {
+    all: pagination?.totalItems || payments.length,
+  };
+  const totalRevenue: number =
+    res?.data?.revenue ??
+    payments.reduce(
+      (sum, p) => (p.status === "Completed" ? sum + (p.amount || 0) : sum),
+      0,
+    );
 
   if (isLoading)
     return (
@@ -125,25 +130,26 @@ const Payments: React.FC = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          {
-            label: "Total Payments",
-            value: pagination?.totalItems || payments.length,
-          },
-          { label: "Revenue", value: `৳${totalRevenue.toLocaleString()}` },
-          {
-            label: "Completed",
-            value: payments.filter((p) => p.status === "Completed").length,
-          },
-          {
-            label: "Pending",
-            value: payments.filter((p) => p.status === "Pending").length,
-          },
-        ].map((s) => (
-          <div key={s.label} className="bg-white rounded-lg shadow p-4">
-            <div className="text-xs text-gray-500">{s.label}</div>
-            <div className="text-2xl font-bold text-gray-900">{s.value}</div>
-          </div>
+        {(
+          [
+            { label: "Total Payments", status: "all", accent: "blue", value: statusCounts.all ?? 0 },
+            // TODO: revenue only sums Completed payments, so it filters to Completed too
+            { label: "Revenue", status: "Completed", accent: "violet", value: `৳${totalRevenue.toLocaleString()}` },
+            { label: "Completed", status: "Completed", accent: "green", value: statusCounts.Completed ?? 0 },
+            { label: "Pending", status: "Pending", accent: "yellow", value: statusCounts.Pending ?? 0 },
+          ] as const
+        ).map((s) => (
+          <StatCard
+            key={s.label}
+            label={s.label}
+            value={s.value}
+            accent={s.accent}
+            selected={statusFilter === s.status && s.label !== "Revenue"}
+            onClick={() => {
+              setStatusFilter(s.status);
+              setPage(1);
+            }}
+          />
         ))}
       </div>
 
@@ -280,28 +286,13 @@ const Payments: React.FC = () => {
         </div>
 
         {pagination && (
-          <div className="flex items-center justify-between px-4 py-3 border-t bg-gray-50 text-sm">
-            <span className="text-gray-600">
-              Page {pagination.currentPage} of {pagination.totalPages} ·{" "}
-              {pagination.totalItems} total
-            </span>
-            <div className="flex gap-2">
-              <button
-                disabled={!pagination.hasPrev}
-                onClick={() => setPage((p) => p - 1)}
-                className="px-3 py-1.5 border rounded-md disabled:opacity-40 hover:bg-white"
-              >
-                <ChevronLeftIcon className="h-4 w-4" />
-              </button>
-              <button
-                disabled={!pagination.hasNext}
-                onClick={() => setPage((p) => p + 1)}
-                className="px-3 py-1.5 border rounded-md disabled:opacity-40 hover:bg-white"
-              >
-                <ChevronRightIcon className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
+          <Pagination
+            page={page}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.totalItems}
+            pageSize={limit}
+            onPageChange={setPage}
+          />
         )}
       </div>
 

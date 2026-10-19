@@ -3,8 +3,6 @@ import {
   PlusIcon,
   TrashIcon,
   MagnifyingGlassIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   XMarkIcon,
   PencilIcon,
   EyeSlashIcon,
@@ -28,6 +26,7 @@ import { parseFieldsWithLLM } from "../services/llmFieldParser";
 import { svgToImgSrc } from "../utils/svgPreview";
 import api from "../services/api";
 import { useConfirm } from "../components/ConfirmDialog";
+import Pagination from "../components/Pagination";
 
 /* ════════════════════════════════════════════════
    PARSER UTILITIES
@@ -1433,27 +1432,13 @@ const UnverifiedBiodatas: React.FC = () => {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100">
-            <p className="text-sm text-slate-500">
-              Page {page} of {totalPages}
-            </p>
-            <div className="flex gap-1">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40"
-              >
-                <ChevronLeftIcon className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40"
-              >
-                <ChevronRightIcon className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            onPageChange={setPage}
+            className="border-t border-slate-100 px-6 py-4"
+          />
         )}
       </div>
 

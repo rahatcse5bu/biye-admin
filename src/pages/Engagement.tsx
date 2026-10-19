@@ -3,8 +3,6 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 import {
   ArrowPathIcon,
   BookmarkIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   FaceSmileIcon,
   HandThumbDownIcon,
   HeartIcon,
@@ -13,6 +11,7 @@ import {
 import { format } from 'date-fns'
 import { useQuery } from '@tanstack/react-query'
 import { engagementService, EngagementType, EngagementUser } from '../services/engagementService'
+import Pagination from '../components/Pagination'
 
 const SITE_URL = 'https://www.bibaho.org'
 
@@ -231,17 +230,7 @@ const Engagement: React.FC = () => {
               </tbody>
             </table>
           </div>
-          <div className="flex items-center justify-between border-t bg-gray-50 px-4 py-3 text-sm">
-            <span className="text-gray-600">Page {page} of {data?.totalPages || 1} · {data?.total ?? 0} result(s)</span>
-            <div className="flex gap-2">
-              <button type="button" aria-label="Previous page" disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className="rounded-md border px-3 py-1.5 hover:bg-white disabled:opacity-40">
-                <ChevronLeftIcon className="h-4 w-4" />
-              </button>
-              <button type="button" aria-label="Next page" disabled={page >= (data?.totalPages || 1)} onClick={() => setPage((p) => p + 1)} className="rounded-md border px-3 py-1.5 hover:bg-white disabled:opacity-40">
-                <ChevronRightIcon className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
+          <Pagination page={page} totalPages={data?.totalPages || 1} totalItems={data?.total ?? 0} pageSize={limit} onPageChange={setPage} />
         </div>
       )}
     </div>

@@ -4,6 +4,7 @@ import { BanknotesIcon, ArrowPathIcon, PencilSquareIcon } from '@heroicons/react
 import { format } from 'date-fns';
 import { toast } from 'react-toastify';
 import { AccountEntry, AccountEntryInput, accountsService, EntryType } from '../services/accountsService';
+import Pagination from '../components/Pagination';
 
 const labels: Record<EntryType, string> = { expense: 'Expense', income: 'Money received', investment: 'Investment' };
 const colors: Record<EntryType, string> = {
@@ -150,13 +151,7 @@ export default function Accounts() {
             </table>
           </div>
         )}
-        {data && !isError && <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 px-5 py-4 text-sm text-slate-500">
-          <span>{data.pagination.totalItems} entries · Page {page} of {data.pagination.totalPages}</span>
-          <div className="flex gap-2">
-            <button type="button" disabled={page <= 1} onClick={() => setPage((current) => current - 1)} className="rounded-lg border border-slate-300 px-3 py-1.5 disabled:opacity-40">Previous</button>
-            <button type="button" disabled={page >= data.pagination.totalPages} onClick={() => setPage((current) => current + 1)} className="rounded-lg border border-slate-300 px-3 py-1.5 disabled:opacity-40">Next</button>
-          </div>
-        </div>}
+        {data && !isError && <Pagination page={page} totalPages={data.pagination.totalPages} totalItems={data.pagination.totalItems} onPageChange={setPage} className="border-t border-slate-200 px-5 py-4" />}
       </section>
     </div>
   );

@@ -6,8 +6,6 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   NoSymbolIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   XMarkIcon,
   ArrowPathIcon,
   DocumentDuplicateIcon,
@@ -26,6 +24,8 @@ import {
   BiodataDetail,
 } from "../services/biodataService";
 import { toast } from "react-toastify";
+import Pagination from "../components/Pagination";
+import StatCard from "../components/StatCard";
 
 /* ── Diff helpers ────────────────────────────────────────── */
 const SKIPPED_DIFF_FIELDS = new Set([
@@ -745,6 +745,7 @@ const Biodatas: React.FC = () => {
     queryFn: () =>
       biodataService.getBiodatas({
         bio_type: bioTypeFilter,
+        status: statusFilter,
         search: debouncedSearch,
         page,
         limit,
@@ -827,15 +828,9 @@ const Biodatas: React.FC = () => {
   const hasActiveFilters =
     search || bioTypeFilter !== "all" || statusFilter !== "all";
 
-  // Compute stats from current data
-  const totalItems = pagination?.totalItems || biodatas.length;
-  const pendingCount = biodatas.filter(
-    (b) => b.biodata_status === "pending",
-  ).length;
-  const approvedCount = biodatas.filter(
-    (b) => b.biodata_status === "approved" || b.user_status === "active",
-  ).length;
-  const bannedCount = biodatas.filter((b) => b.user_status === "banned").length;
+  const statusCounts: Record<string, number> = res?.data?.statusCounts ?? {
+    all: pagination?.totalItems || biodatas.length,
+  };
 
   if (isLoading)
     return (
@@ -873,42 +868,26 @@ const Biodatas: React.FC = () => {
 
       {/* Stats row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          {
-            label: "Total Biodatas",
-            value: totalItems,
-            icon: <UserGroupIcon className="h-5 w-5" />,
-            color: "text-indigo-600 bg-indigo-50",
-          },
-          {
-            label: "Active",
-            value: approvedCount,
-            icon: <CheckBadgeIcon className="h-5 w-5" />,
-            color: "text-emerald-600 bg-emerald-50",
-          },
-          {
-            label: "Pending Review",
-            value: pendingCount,
-            icon: <ClockIcon className="h-5 w-5" />,
-            color: "text-amber-600 bg-amber-50",
-          },
-          {
-            label: "Banned",
-            value: bannedCount,
-            icon: <NoSymbolIcon className="h-5 w-5" />,
-            color: "text-red-600 bg-red-50",
-          },
-        ].map((s) => (
-          <div
+        {(
+          [
+            { label: "Total Biodatas", status: "all", icon: <UserGroupIcon className="h-5 w-5" />, accent: "indigo" },
+            { label: "Active", status: "active", icon: <CheckBadgeIcon className="h-5 w-5" />, accent: "green" },
+            { label: "Pending Review", status: "pending", icon: <ClockIcon className="h-5 w-5" />, accent: "yellow" },
+            { label: "Banned", status: "banned", icon: <NoSymbolIcon className="h-5 w-5" />, accent: "red" },
+          ] as const
+        ).map((s) => (
+          <StatCard
             key={s.label}
-            className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-4"
-          >
-            <div className={`p-2.5 rounded-xl ${s.color}`}>{s.icon}</div>
-            <div>
-              <p className="text-xs text-gray-500 font-medium">{s.label}</p>
-              <p className="text-2xl font-bold text-gray-900">{s.value}</p>
-            </div>
-          </div>
+            label={s.label}
+            value={statusCounts[s.status] ?? 0}
+            icon={s.icon}
+            accent={s.accent}
+            selected={statusFilter === s.status}
+            onClick={() => {
+              setStatusFilter(s.status);
+              setPage(1);
+            }}
+          />
         ))}
       </div>
 
@@ -958,6 +937,7 @@ const Biodatas: React.FC = () => {
             <option value="inactive">Inactive</option>
             <option value="banned">Banned</option>
             <option value="pending">Pending</option>
+            <option value="approved">Verified</option>
           </select>
 
           {/* Clear Filters */}
@@ -1222,39 +1202,14 @@ const Biodatas: React.FC = () => {
 
         {/* Pagination */}
         {pagination && pagination.totalItems > 0 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-gray-50/50">
-            <span className="text-sm text-gray-500">
-              Page{" "}
-              <span className="font-semibold text-gray-700">
-                {pagination.currentPage}
-              </span>{" "}
-              of{" "}
-              <span className="font-semibold text-gray-700">
-                {pagination.totalPages}
-              </span>{" "}
-              ·{" "}
-              <span className="font-semibold text-gray-700">
-                {pagination.totalItems}
-              </span>{" "}
-              total
-            </span>
-            <div className="flex gap-2">
-              <button
-                disabled={!pagination.hasPrev}
-                onClick={() => setPage((p) => p - 1)}
-                className="flex items-center gap-1 px-3 py-1.5 border border-gray-200 rounded-lg text-sm disabled:opacity-40 hover:bg-white transition-colors"
-              >
-                <ChevronLeftIcon className="h-4 w-4" />
-              </button>
-              <button
-                disabled={!pagination.hasNext}
-                onClick={() => setPage((p) => p + 1)}
-                className="flex items-center gap-1 px-3 py-1.5 border border-gray-200 rounded-lg text-sm disabled:opacity-40 hover:bg-white transition-colors"
-              >
-                <ChevronRightIcon className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
+          <Pagination
+            page={page}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.totalItems}
+            pageSize={limit}
+            onPageChange={setPage}
+            className="border-t border-gray-100 bg-gray-50/50"
+          />
         )}
       </div>
 
