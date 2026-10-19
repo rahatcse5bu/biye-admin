@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDebounce } from "../hooks/useDebounce";
 import {
   PlusIcon,
   TrashIcon,
@@ -1105,8 +1106,8 @@ const UnverifiedBiodatas: React.FC = () => {
   const confirm = useConfirm();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
+  const search = useDebounce(searchInput.trim(), 400);
   const [showForm, setShowForm] = useState(false);
   const [editTarget, setEditTarget] = useState<UnverifiedBiodata | null>(null);
   const [showPhotocardModal, setShowPhotocardModal] = useState(false);
@@ -1120,7 +1121,12 @@ const UnverifiedBiodatas: React.FC = () => {
     queryKey: ["unverified-biodatas", page, search],
     queryFn: () =>
       unverifiedBiodataService.getAll(page, 20, search || undefined),
+    placeholderData: (previous) => previous,
   });
+
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
 
   const createMut = useMutation({
     mutationFn: unverifiedBiodataService.create,
@@ -1244,31 +1250,12 @@ const UnverifiedBiodatas: React.FC = () => {
               placeholder="Search by name or zilla…"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  setSearch(searchInput);
-                  setPage(1);
-                }
-              }}
               className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
-          <button
-            onClick={() => {
-              setSearch(searchInput);
-              setPage(1);
-            }}
-            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg"
-          >
-            Search
-          </button>
-          {search && (
+          {searchInput && (
             <button
-              onClick={() => {
-                setSearch("");
-                setSearchInput("");
-                setPage(1);
-              }}
+              onClick={() => setSearchInput("")}
               className="px-3 py-2 text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg"
             >
               Clear

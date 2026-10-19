@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useDebounce } from "../hooks/useDebounce";
 import {
   EyeIcon,
   TrashIcon,
@@ -727,6 +728,11 @@ const Biodatas: React.FC = () => {
 
   const debouncedSearch = useDebounce(search, 400);
 
+  // TODO: page resets when the debounced term changes, so typing doesn't fire a request with the old term.
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
+
   const {
     data: res,
     isLoading,
@@ -750,6 +756,7 @@ const Biodatas: React.FC = () => {
         page,
         limit,
       }),
+    placeholderData: (previous) => previous,
   });
 
   const biodatas: Biodata[] = res?.data?.biodatas || [];
@@ -902,10 +909,7 @@ const Biodatas: React.FC = () => {
               placeholder="Search by user ID..."
               className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50/50 transition-colors"
               value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
+              onChange={(e) => setSearch(e.target.value)}
             />
           </div>
 
@@ -1310,15 +1314,5 @@ const Biodatas: React.FC = () => {
     </div>
   );
 };
-
-/* ── useDebounce hook ─────────────────────────────────── */
-function useDebounce(value: string, delay: number) {
-  const [debounced, setDebounced] = useState(value);
-  React.useEffect(() => {
-    const t = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(t);
-  }, [value, delay]);
-  return debounced;
-}
 
 export default Biodatas;
